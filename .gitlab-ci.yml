@@ -76,6 +76,16 @@ build_prod:
           -e "ssh $SSH_OPTS -p $SSH_PORT" \
           dist/blipzo-admin/ \
           "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+    - |
+        ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+          "SERVE_DIR='$SERVE_DIR' SERVE_PORT='$SERVE_PORT' bash -s" <<'EOF'
+        set -euo pipefail
+        if command -v fuser >/dev/null 2>&1; then
+          fuser -k "${SERVE_PORT}/tcp" || true
+        fi
+        nohup python3 -m http.server "$SERVE_PORT" --bind 127.0.0.1 --directory "$SERVE_DIR" \
+          >/var/log/blipzo-admin-httpserver-${SERVE_PORT}.log 2>&1 &
+        EOF
 
 deploy_stg:
   extends: .deploy_template
@@ -86,6 +96,8 @@ deploy_stg:
     - if: '$CI_COMMIT_BRANCH == "dev"'
   variables:
     DEPLOY_PATH: /var/www/blipzo-admin-stg
+    SERVE_DIR: /var/www/blipzo-admin-stg/browser
+    SERVE_PORT: "4201"
 
 deploy_prod:
   extends: .deploy_template
@@ -96,3 +108,5 @@ deploy_prod:
     - if: '$CI_COMMIT_BRANCH == "main"'
   variables:
     DEPLOY_PATH: /var/www/blipzo-admin-prod
+    SERVE_DIR: /var/www/blipzo-admin-prod/browser
+    SERVE_PORT: "4202"
