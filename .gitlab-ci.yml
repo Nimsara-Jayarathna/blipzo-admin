@@ -10,8 +10,6 @@ workflow:
 .build_template:
   stage: build
   image: node:20-alpine
-  variables:
-    NODE_ENV: production
   cache:
     key: ${CI_PROJECT_NAME}
     paths:
