@@ -3,12 +3,16 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
+import {
+  AuthFeedbackComponent,
+  AuthFeedbackState,
+} from '../../shared/ui/auth-feedback/auth-feedback';
 
-type LoginState = 'idle' | 'submitting' | 'success' | 'error';
+type LoginState = AuthFeedbackState;
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AuthFeedbackComponent],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -25,6 +29,7 @@ export class Login {
   loginState: LoginState = 'idle';
   isSubmitting = false;
   errorMessage = '';
+  feedbackMessage = '';
   private successRedirectTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnDestroy(): void {
@@ -40,7 +45,8 @@ export class Login {
     }
 
     this.errorMessage = '';
-    this.loginState = 'submitting';
+    this.feedbackMessage = '';
+    this.loginState = 'loading';
     this.isSubmitting = true;
 
     this.authService
@@ -49,13 +55,15 @@ export class Login {
       .subscribe({
         next: () => {
           this.loginState = 'success';
+          this.feedbackMessage = 'Login successful.';
           this.successRedirectTimer = setTimeout(() => {
             void this.router.navigate(['/dashboard']);
-          }, 1200);
+          }, 250);
         },
         error: (error: Error) => {
           this.loginState = 'error';
           this.errorMessage = error.message || 'Unable to sign in. Please verify your credentials.';
+          this.feedbackMessage = this.errorMessage;
         },
       });
   }

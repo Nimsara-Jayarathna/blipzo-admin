@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
 import { Login } from './login';
@@ -55,9 +55,10 @@ describe('Login', () => {
 
     component.onSubmit();
     expect(component.loginState).toBe('success');
+    expect(component.feedbackMessage).toBe('Login successful.');
     expect(navigateSpy).not.toHaveBeenCalled();
 
-    await new Promise((resolve) => setTimeout(resolve, 1300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
     expect(navigateSpy).toHaveBeenCalledWith(['/dashboard']);
   });
 
@@ -73,6 +74,26 @@ describe('Login', () => {
 
     expect(component.loginState).toBe('error');
     expect(component.errorMessage).toBe('Incorrect email or password.');
+    expect(component.feedbackMessage).toBe('Incorrect email or password.');
     expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should show loading state while request is processing', () => {
+    loginMock.mockReturnValue(
+      new Observable<LoginResponse>((subscriber) => {
+        // keep request open to assert immediate loading state
+        void subscriber;
+      }),
+    );
+
+    component.loginForm.setValue({
+      email: 'admin@enterprise.com',
+      password: 'password123',
+    });
+
+    component.onSubmit();
+
+    expect(component.loginState).toBe('loading');
+    expect(component.isSubmitting).toBe(true);
   });
 });

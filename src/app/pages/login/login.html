@@ -9,11 +9,7 @@
       </header>
 
       <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-        @if (loginState === 'error' && errorMessage) {
-          <p class="submit-error error-banner" role="alert">
-            {{ errorMessage }}
-          </p>
-        }
+        <app-auth-feedback [state]="loginState" [message]="feedbackMessage"></app-auth-feedback>
 
         <div class="field-group">
           <label for="email">Email Address</label>
@@ -62,19 +58,4 @@
       </form>
     </div>
   </main>
-
-  @if (loginState === 'success') {
-    <div class="success-overlay" role="status" aria-live="polite">
-      <div class="success-card">
-        <div class="success-icon" aria-hidden="true">✓</div>
-        <h2>Login Successful</h2>
-        <p>Redirecting to dashboard...</p>
-        <div class="success-dots" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </div>
-  }
 </section>

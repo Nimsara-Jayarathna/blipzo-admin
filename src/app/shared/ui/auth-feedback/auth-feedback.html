@@ -1,0 +1,30 @@
+@if (state() !== 'idle') {
+  <div
+    class="auth-feedback"
+    [class.feedback-loading]="state() === 'loading'"
+    [class.feedback-error]="state() === 'error'"
+    [class.feedback-success]="state() === 'success'"
+    [attr.role]="state() === 'error' ? 'alert' : 'status'"
+    aria-live="polite"
+  >
+    <span class="feedback-icon" aria-hidden="true">
+      @if (state() === 'loading') {
+        <span class="spinner"></span>
+      } @else if (state() === 'success') {
+        ✓
+      } @else {
+        !
+      }
+    </span>
+
+    <span>
+      @if (state() === 'loading') {
+        {{ loadingMessage() }}
+      } @else if (state() === 'success') {
+        {{ successMessage() }}
+      } @else {
+        {{ message() }}
+      }
+    </span>
+  </div>
+}
