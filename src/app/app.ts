@@ -6,7 +6,6 @@ import { GlobalRequestFeedbackModalComponent } from './shared/ui/global-request-
   selector: 'app-root',
   imports: [RouterOutlet, GlobalRequestFeedbackModalComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
 })
 export class App {
   protected readonly title = signal('blipzo-admin');

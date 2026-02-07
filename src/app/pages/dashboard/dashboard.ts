@@ -7,7 +7,6 @@ import { AuthService } from '../../core/auth/auth.service';
   selector: 'app-dashboard',
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {

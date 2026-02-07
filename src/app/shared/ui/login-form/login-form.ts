@@ -5,7 +5,6 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   selector: 'app-login-form',
   imports: [ReactiveFormsModule],
   templateUrl: './login-form.html',
-  styleUrl: './login-form.css',
 })
 export class LoginFormComponent {
   readonly form = input.required<FormGroup>();

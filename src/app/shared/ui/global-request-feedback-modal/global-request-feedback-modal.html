@@ -1,18 +1,36 @@
 @if (isVisible()) {
-  <div class="request-modal-overlay" [class.error-mode]="isError()">
-    <section class="request-modal-card" role="status" aria-live="polite">
+  <div class="fixed inset-0 z-[2000] grid place-items-center bg-[rgba(3,8,16,0.64)] backdrop-blur-[3px]">
+    <section
+      class="grid w-[min(92vw,23rem)] justify-items-center gap-3 rounded-2xl border border-[#34435b] bg-gradient-to-b from-[#172233] to-[#121d2c] px-5 py-5 text-center shadow-[0_25px_55px_rgba(0,0,0,0.45)]"
+      role="status"
+      aria-live="polite"
+    >
       @if (isLoading()) {
-        <div class="spinner" aria-hidden="true"></div>
-        <h2>Processing</h2>
+        <div
+          class="h-10 w-10 animate-spin rounded-full border-[0.28rem] border-[rgba(122,153,194,0.35)] border-t-[#2ea0ff]"
+          aria-hidden="true"
+        ></div>
+        <h2 class="m-0 text-[1.35rem] text-[#f5f9ff]">Processing</h2>
       } @else {
-        <div class="error-icon" aria-hidden="true">!</div>
-        <h2>Request Failed</h2>
+        <div
+          class="grid h-10 w-10 place-items-center rounded-full border border-[rgba(251,113,133,0.45)] bg-[rgba(190,24,93,0.2)] font-bold text-[#fda4af]"
+          aria-hidden="true"
+        >
+          !
+        </div>
+        <h2 class="m-0 text-[1.35rem] text-[#f5f9ff]">Request Failed</h2>
       }
 
-      <p>{{ state().message }}</p>
+      <p class="m-0 text-[0.95rem] text-[#adbad0]">{{ state().message }}</p>
 
       @if (isError()) {
-        <button type="button" (click)="close()">Close</button>
+        <button
+          type="button"
+          (click)="close()"
+          class="rounded-lg bg-[#238ff7] px-4 py-2 text-[0.9rem] font-bold text-[#eff6ff] transition hover:bg-[#177ce0]"
+        >
+          Close
+        </button>
       }
     </section>
   </div>

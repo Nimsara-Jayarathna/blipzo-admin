@@ -1,10 +1,10 @@
-<section class="usage-card">
-  <header>
-    <h3>Currency Usage Distribution</h3>
-    <div class="period-switch">
+<section class="min-h-[28rem] rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] p-4">
+  <header class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <h3 class="m-0 text-2xl text-[#f4f8ff] sm:text-[2rem]">Currency Usage Distribution</h3>
+    <div class="flex gap-2">
       <button
         type="button"
-        [class.active]="selectedPeriod() === '30d'"
+        [class]="periodButtonClass('30d')"
         [disabled]="isLoading()"
         (click)="onPeriodSelect('30d')"
       >
@@ -12,7 +12,7 @@
       </button>
       <button
         type="button"
-        [class.active]="selectedPeriod() === '90d'"
+        [class]="periodButtonClass('90d')"
         [disabled]="isLoading()"
         (click)="onPeriodSelect('90d')"
       >
@@ -21,21 +21,25 @@
     </div>
   </header>
 
-  <div class="usage-content">
-    <div class="ring">
-      <div class="ring-inner">
-        <span>Total</span>
-        <strong>${{ usage().totalAmount.toLocaleString() }}</strong>
+  <div class="grid min-h-[24.8rem] place-items-center gap-11 rounded-2xl border border-[#32425a] px-4 py-9">
+    <div
+      class="relative h-[8.4rem] w-[8.4rem] rounded-full border-[0.55rem] border-[#293850] before:absolute before:inset-[-0.55rem] before:rounded-full before:border-[0.55rem] before:border-transparent before:border-r-[rgba(33,150,243,0.55)] before:border-t-[#2196f3] before:content-['']"
+    >
+      <div class="absolute inset-0 grid place-content-center text-center">
+        <span class="text-[0.8rem] font-semibold text-[#8ea0bb]">Total</span>
+        <strong class="text-4xl font-bold text-[#f8fbff] sm:text-[2.75rem]">${{ usage().totalAmount.toLocaleString() }}</strong>
       </div>
     </div>
 
-    <div class="legend">
+    <div class="flex flex-wrap justify-center gap-x-12 gap-y-4">
       @for (segment of usage().segments; track segment.code) {
-        <div class="legend-item">
-          <div class="bar"></div>
-          <span>{{ segment.code }} ({{ segment.percent }}%)</span>
+        <div class="grid gap-2">
+          <div class="h-[0.55rem] w-[3.2rem] rounded-full bg-[#2196f3]"></div>
+          <span class="text-[0.85rem] font-semibold text-[#8ea0bb]">{{ segment.code }} ({{ segment.percent }}%)</span>
         </div>
       }
     </div>
+
+    <p class="m-0 text-[0.95rem] italic text-[#8495ad]">[ Chart Visualization Placeholder ]</p>
   </div>
 </section>

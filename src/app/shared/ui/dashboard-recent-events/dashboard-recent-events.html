@@ -1,29 +1,35 @@
-<section class="events-card">
-  <header>
-    <h3>Recent System Events</h3>
-    <button type="button">View All</button>
+<section class="self-start rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] p-4">
+  <header class="mb-3 flex items-center justify-between gap-3">
+    <h3 class="m-0 text-2xl text-[#f4f8ff] sm:text-[2rem]">Recent System Events</h3>
+    <button type="button" class="font-bold text-[#2ea0ff]">View All</button>
   </header>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
+  <div class="overflow-hidden rounded-xl border border-[#32425a]">
+    <table class="w-full border-collapse">
+      <thead class="bg-[#1a2536]">
         <tr>
-          <th>Level</th>
-          <th>Event</th>
-          <th>Time</th>
+          <th class="px-3 py-3 text-left text-[0.75rem] uppercase tracking-[0.05em] text-[#91a2bd]">Level</th>
+          <th class="px-3 py-3 text-left text-[0.75rem] uppercase tracking-[0.05em] text-[#91a2bd]">Event</th>
+          <th class="px-3 py-3 text-left text-[0.75rem] uppercase tracking-[0.05em] text-[#91a2bd]">Time</th>
         </tr>
       </thead>
       <tbody>
-        @for (event of events(); track event.message + event.occurredAt) {
+        @if (events().length === 0) {
           <tr>
-            <td>
-              <span class="level-chip" [class]="levelClass(event.level)">
-                {{ event.level }}
-              </span>
-            </td>
-            <td>{{ event.message }}</td>
-            <td>{{ event.occurredAt }}</td>
+            <td class="px-3 py-3 text-left text-[#91a2bd]" colspan="3">No events available.</td>
           </tr>
+        } @else {
+          @for (event of events(); track event.message + event.occurredAt) {
+            <tr class="border-t border-[#2a364b] text-[0.92rem] text-[#e7eefc] hover:bg-[#1a2538]">
+              <td class="px-3 py-3">
+                <span [class]="levelChipClass(event.level)">
+                  {{ event.level }}
+                </span>
+              </td>
+              <td class="px-3 py-3">{{ event.message }}</td>
+              <td class="px-3 py-3">{{ event.occurredAt }}</td>
+            </tr>
+          }
         }
       </tbody>
     </table>

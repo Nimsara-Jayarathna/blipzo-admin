@@ -4,7 +4,6 @@ import { HttpRequestFeedbackService } from '../../../core/http/http-request-feed
 @Component({
   selector: 'app-global-request-feedback-modal',
   templateUrl: './global-request-feedback-modal.html',
-  styleUrl: './global-request-feedback-modal.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalRequestFeedbackModalComponent {

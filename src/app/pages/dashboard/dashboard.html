@@ -1,34 +1,92 @@
-<div class="dashboard-layout">
-  <aside class="dashboard-sidebar">
-    <div class="brand">
-      <div class="brand-logo">B</div>
-      <h2 class="dashboard-title">BLIPZO ADMIN</h2>
+<div class="grid min-h-screen bg-gradient-to-b from-[#081321] to-[#0a1b31] lg:grid-cols-[275px_1fr]">
+  <aside class="flex flex-col gap-4 border-b border-[#22304a] bg-[#0c131f] px-4 pb-4 pt-6 lg:border-b-0 lg:border-r">
+    <div class="flex items-center gap-3 px-1">
+      <div
+        class="grid h-8 w-8 place-items-center rounded-md bg-gradient-to-b from-[#2ea0ff] to-[#1278e8] font-bold text-[#f8fbff] shadow-[0_6px_18px_rgba(17,125,242,0.4)]"
+      >
+        B
+      </div>
+      <h2 class="m-0 text-3xl tracking-[0.015em] text-[#d4deee]">BLIPZO ADMIN</h2>
     </div>
 
-    <nav class="dashboard-nav">
-      <a routerLink="/dashboard" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active-link">
+    <nav class="grid gap-1 sm:grid-cols-2 lg:grid-cols-1">
+      <a
+        routerLink="/dashboard"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="bg-[#102642] text-[#2ea0ff] border-[#26568e]"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-[0.95rem] font-semibold text-[#a0aec2] no-underline transition hover:bg-[#101f34]"
+      >
+        <span aria-hidden="true">◼</span>
         Dashboard
       </a>
-      <a routerLink="users" routerLinkActive="active-link">Users</a>
-      <a routerLink="currencies" routerLinkActive="active-link">Currencies</a>
-      <a routerLink="categories" routerLinkActive="active-link">Categories</a>
-      <a routerLink="system" routerLinkActive="active-link">System</a>
+      <a
+        routerLink="users"
+        routerLinkActive="bg-[#102642] text-[#2ea0ff] border-[#26568e]"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-[0.95rem] font-semibold text-[#a0aec2] no-underline transition hover:bg-[#101f34]"
+      >
+        <span aria-hidden="true">👤</span>
+        Users
+      </a>
+      <a
+        routerLink="currencies"
+        routerLinkActive="bg-[#102642] text-[#2ea0ff] border-[#26568e]"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-[0.95rem] font-semibold text-[#a0aec2] no-underline transition hover:bg-[#101f34]"
+      >
+        <span aria-hidden="true">¤</span>
+        Currencies
+      </a>
+      <a
+        routerLink="categories"
+        routerLinkActive="bg-[#102642] text-[#2ea0ff] border-[#26568e]"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-[0.95rem] font-semibold text-[#a0aec2] no-underline transition hover:bg-[#101f34]"
+      >
+        <span aria-hidden="true">▦</span>
+        Categories
+      </a>
+      <a
+        routerLink="system"
+        routerLinkActive="bg-[#102642] text-[#2ea0ff] border-[#26568e]"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-[0.95rem] font-semibold text-[#a0aec2] no-underline transition hover:bg-[#101f34]"
+      >
+        <span aria-hidden="true">⚙</span>
+        System
+      </a>
     </nav>
 
-    <button class="logout-button" type="button" [disabled]="isSigningOut" (click)="onLogout()">
+    <button
+      class="mt-auto rounded-xl border border-[rgba(244,63,94,0.3)] bg-[rgba(190,24,93,0.16)] px-3 py-3 text-base font-bold text-[#fda4af] transition hover:bg-[rgba(190,24,93,0.3)] disabled:cursor-not-allowed disabled:opacity-60"
+      type="button"
+      [disabled]="isSigningOut"
+      (click)="onLogout()"
+    >
       {{ isSigningOut ? 'Logging out...' : 'Logout' }}
     </button>
   </aside>
 
-  <main class="dashboard-content">
-    <header class="dashboard-header">
-      <div class="dashboard-header-main">
-        <h1>System Dashboard</h1>
-        <span>Admin Access</span>
+  <main class="flex min-w-0 flex-col">
+    <header class="flex flex-wrap items-center justify-between gap-4 border-b border-[#22304a] bg-[#0c1421] px-6 py-4">
+      <div class="flex items-center gap-3">
+        <h1 class="m-0 text-2xl font-bold tracking-[0.01em] text-[#f4f8ff] sm:text-[2rem]">System Dashboard</h1>
+        <span
+          class="inline-flex items-center rounded-md border border-[#35435a] px-2 py-1 text-[0.72rem] font-bold uppercase tracking-[0.06em] text-[#95a3ba]"
+        >
+          Admin Access
+        </span>
       </div>
-      <div class="dashboard-user">sys_admin_01</div>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="relative h-8 w-8 rounded-full border border-[#35435a] bg-[#122037]"
+          aria-label="Notifications"
+        >
+          <span class="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#85a9d8]"></span>
+        </button>
+        <div class="rounded-lg border border-[#35435a] px-3 py-1.5 text-[0.95rem] font-semibold text-[#d4deee]">sys_admin_01</div>
+      </div>
     </header>
 
-    <router-outlet></router-outlet>
+    <section class="mx-auto w-full max-w-[1365px] min-w-0 px-4 py-5 sm:px-6 sm:py-6">
+      <router-outlet></router-outlet>
+    </section>
   </main>
 </div>

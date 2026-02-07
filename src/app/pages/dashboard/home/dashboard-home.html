@@ -1,15 +1,25 @@
-<section class="dashboard-home">
+<section class="block w-full">
   @if (isLoading) {
-    <div class="state-card">Loading dashboard data...</div>
+    <div class="flex min-h-[17rem] items-center justify-center rounded-2xl border border-[#2f3b4e] bg-[#111924] text-[#dce8ff]">
+      Loading dashboard data...
+    </div>
   } @else if (errorMessage) {
-    <div class="state-card state-error">
-      <p>{{ errorMessage }}</p>
-      <button type="button" (click)="onRetry()">Retry</button>
+    <div
+      class="flex min-h-[17rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#2f3b4e] bg-[#111924] text-[#dce8ff]"
+    >
+      <p class="m-0">{{ errorMessage }}</p>
+      <button
+        type="button"
+        (click)="onRetry()"
+        class="rounded-lg bg-[#188dff] px-4 py-2 font-bold text-[#f2f8ff] transition hover:bg-[#1178dc]"
+      >
+        Retry
+      </button>
     </div>
   } @else if (snapshot) {
-    <app-dashboard-kpi-cards [summary]="snapshot.summary"></app-dashboard-kpi-cards>
+    <app-dashboard-kpi-cards class="mb-4 block" [summary]="snapshot.summary"></app-dashboard-kpi-cards>
 
-    <section class="dashboard-grid">
+    <section class="grid gap-3 xl:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
       <app-dashboard-currency-usage
         [usage]="snapshot.currencyUsage"
         [selectedPeriod]="selectedPeriod"

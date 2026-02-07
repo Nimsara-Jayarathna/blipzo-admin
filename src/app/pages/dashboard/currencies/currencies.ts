@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-currencies',
   imports: [],
   templateUrl: './currencies.html',
-  styleUrl: './currencies.css',
 })
 export class Currencies {
 

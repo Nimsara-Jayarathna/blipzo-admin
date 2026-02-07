@@ -13,7 +13,6 @@ type LoginState = 'idle' | 'loading' | 'error';
   selector: 'app-login',
   imports: [ReactiveFormsModule, LoginFormComponent],
   templateUrl: './login.html',
-  styleUrl: './login.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {

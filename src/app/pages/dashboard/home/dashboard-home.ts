@@ -17,7 +17,6 @@ import { DashboardRecentEventsComponent } from '../../../shared/ui/dashboard-rec
     DashboardRecentEventsComponent,
   ],
   templateUrl: './dashboard-home.html',
-  styleUrl: './dashboard-home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardHome {
