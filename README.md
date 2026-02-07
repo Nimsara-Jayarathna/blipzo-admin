@@ -76,6 +76,13 @@ Example:
 
 `https://api.example.com/api/v1/admin/auth/login`
 
+### Authentication mode
+
+- Cookie-based auth (`HttpOnly` + `Secure`) is used.
+- Frontend does not use `localStorage` for tokens.
+- Admin API requests are sent with `withCredentials: true`.
+- Backend should enforce `15 minute` access-token lifetime.
+
 ## API Contract Documentation
 
 Admin API contract (routes, request/response envelopes, login schema) is documented in:

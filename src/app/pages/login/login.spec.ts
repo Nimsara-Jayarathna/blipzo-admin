@@ -11,18 +11,17 @@ describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
   let navigateSpy: ReturnType<typeof vi.spyOn>;
-  const isAuthenticatedMock = vi.fn<() => boolean>(() => false);
+  const checkSessionMock = vi.fn(() => of(false));
   const loginMock = vi.fn();
   const authServiceMock = {
-    isAuthenticated: isAuthenticatedMock,
+    checkSession: checkSessionMock,
     login: loginMock,
-  } as Pick<AuthService, 'isAuthenticated' | 'login'>;
+  } as Pick<AuthService, 'checkSession' | 'login'>;
 
   beforeEach(async () => {
-    localStorage.clear();
-    isAuthenticatedMock.mockReset();
+    checkSessionMock.mockReset();
     loginMock.mockReset();
-    isAuthenticatedMock.mockReturnValue(false);
+    checkSessionMock.mockReturnValue(of(false));
 
     await TestBed.configureTestingModule({
       imports: [Login],
@@ -33,10 +32,6 @@ describe('Login', () => {
     component = fixture.componentInstance;
     navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     await fixture.whenStable();
-  });
-
-  afterEach(() => {
-    localStorage.clear();
   });
 
   it('should create', () => {
@@ -50,13 +45,10 @@ describe('Login', () => {
 
   it('should navigate to dashboard after successful login', async () => {
     const response: LoginResponse = {
-      accessToken: 'access-token',
-      refreshToken: 'refresh-token',
-      tokenType: 'Bearer',
-      expiresIn: 3600,
       userEmail: 'admin@enterprise.com',
       userId: 'admin-1',
       roles: ['super_admin'],
+      accessTokenExpiresInSeconds: 900,
     };
     loginMock.mockReturnValue(of(response));
 

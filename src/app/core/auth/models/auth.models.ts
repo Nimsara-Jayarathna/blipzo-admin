@@ -4,13 +4,10 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  accessToken: string;
-  refreshToken?: string;
-  tokenType: string;
-  expiresIn: number;
   userEmail: string;
   userId: string;
   roles: string[];
+  accessTokenExpiresInSeconds: number;
 }
 
 export interface ApiSuccessResponse<T> {
@@ -34,13 +31,24 @@ export interface ApiErrorResponse {
 }
 
 export interface AdminLoginApiData {
-  accessToken: string;
-  refreshToken?: string;
-  tokenType?: string;
-  expiresIn?: number;
   admin: {
     id: string;
     email: string;
     roles?: string[];
+  };
+  session: {
+    accessTokenExpiresInSeconds: number;
+  };
+}
+
+export interface AdminSessionApiData {
+  authenticated: boolean;
+  admin?: {
+    id: string;
+    email: string;
+    roles?: string[];
+  };
+  session?: {
+    accessTokenExpiresInSeconds?: number;
   };
 }

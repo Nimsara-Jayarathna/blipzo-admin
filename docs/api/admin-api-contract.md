@@ -22,9 +22,19 @@ Resulting base path:
 ## Endpoint Convention
 
 - Admin auth login: `POST /api/v1/admin/auth/login`
+- Admin auth session check: `GET /api/v1/admin/auth/session`
+- Admin auth logout: `POST /api/v1/admin/auth/logout`
 - Admin users list: `GET /api/v1/admin/users`
 - Admin user detail: `GET /api/v1/admin/users/{id}`
 - Admin system settings: `GET /api/v1/admin/system/settings`
+
+## Authentication Model
+
+- Authentication is cookie-based (`HttpOnly`, `Secure`, `SameSite` as per deployment policy).
+- Frontend does not store tokens in `localStorage` or `sessionStorage`.
+- Frontend sends requests with `withCredentials: true`.
+- Backend should issue an access token cookie (`15 minutes` TTL).
+- Access token expiry (15 minutes) is enforced by backend. Frontend must not be the source of truth for auth lifetime.
 
 ## Success Response Envelope
 
@@ -80,14 +90,13 @@ All non-2xx responses should use:
   "success": true,
   "message": "Login successful.",
   "data": {
-    "accessToken": "jwt-access-token",
-    "refreshToken": "jwt-refresh-token",
-    "tokenType": "Bearer",
-    "expiresIn": 3600,
     "admin": {
       "id": "admin-1",
       "email": "admin@enterprise.com",
       "roles": ["super_admin"]
+    },
+    "session": {
+      "accessTokenExpiresInSeconds": 900
     }
   },
   "meta": {
@@ -112,12 +121,65 @@ Status: `401 Unauthorized`
 }
 ```
 
+## Session Check Contract
+
+### Request
+
+`GET /api/v1/admin/auth/session`
+
+### Success Response (authenticated)
+
+```json
+{
+  "success": true,
+  "message": "Session active.",
+  "data": {
+    "authenticated": true,
+    "admin": {
+      "id": "admin-1",
+      "email": "admin@enterprise.com",
+      "roles": ["super_admin"]
+    },
+    "session": {
+      "accessTokenExpiresInSeconds": 900
+    }
+  }
+}
+```
+
+### Unauthorized Response
+
+Status: `401 Unauthorized`
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+```
+
+## Logout Contract
+
+### Request
+
+`POST /api/v1/admin/auth/logout`
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "message": "Logged out successfully.",
+  "data": {}
+}
+```
+
 ## Frontend Integration Notes
 
 - Login request URL is built from environment variables.
-- Auth token is stored as serialized admin session.
-- Authorization header is attached automatically for admin endpoints, except login.
-- Guard checks `AuthService.isAuthenticated()`.
+- No tokens are persisted in browser storage.
+- Requests to admin API use `withCredentials: true`.
+- Guard checks backend session via `GET /auth/session`.
 
 ## Recommended HTTP Status Usage
 

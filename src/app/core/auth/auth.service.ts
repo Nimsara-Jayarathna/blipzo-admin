@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { adminApiUrl } from '../api/api-endpoints';
 import {
+  AdminSessionApiData,
   AdminLoginApiData,
   ApiErrorResponse,
   ApiSuccessResponse,
@@ -10,8 +11,9 @@ import {
   LoginResponse,
 } from './models/auth.models';
 
-const SESSION_KEY = 'adminAuthSession';
 const LOGIN_URL = adminApiUrl('auth/login');
+const LOGOUT_URL = adminApiUrl('auth/logout');
+const SESSION_URL = adminApiUrl('auth/session');
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -24,51 +26,30 @@ export class AuthService {
     }
 
     return this.http
-      .post<ApiSuccessResponse<AdminLoginApiData>>(LOGIN_URL, { email, password: payload.password })
+      .post<ApiSuccessResponse<AdminLoginApiData>>(
+        LOGIN_URL,
+        { email, password: payload.password },
+        { withCredentials: true },
+      )
       .pipe(
         map((response) => this.normalizeLoginResponse(response)),
-        map((response) => {
-          this.persistSession(response);
-          return response;
-        }),
         catchError((error: HttpErrorResponse) =>
           throwError(() => new Error(this.extractErrorMessage(error))),
         ),
       );
   }
 
-  logout(): void {
-    localStorage.removeItem(SESSION_KEY);
+  logout(): Observable<void> {
+    return this.http.post<void>(LOGOUT_URL, {}, { withCredentials: true });
   }
 
-  isAuthenticated(): boolean {
-    return Boolean(this.getStoredSession()?.accessToken);
-  }
-
-  getUserEmail(): string | null {
-    return this.getStoredSession()?.userEmail ?? null;
-  }
-
-  getAccessToken(): string | null {
-    return this.getStoredSession()?.accessToken ?? null;
-  }
-
-  private persistSession(response: LoginResponse): void {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(response));
-  }
-
-  private getStoredSession(): LoginResponse | null {
-    const rawSession = localStorage.getItem(SESSION_KEY);
-    if (!rawSession) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(rawSession) as LoginResponse;
-    } catch {
-      localStorage.removeItem(SESSION_KEY);
-      return null;
-    }
+  checkSession(): Observable<boolean> {
+    return this.http
+      .get<ApiSuccessResponse<AdminSessionApiData>>(SESSION_URL, { withCredentials: true })
+      .pipe(
+        map((response) => Boolean(response.data.authenticated)),
+        catchError(() => of(false)),
+      );
   }
 
   private normalizeLoginResponse(
@@ -76,13 +57,10 @@ export class AuthService {
   ): LoginResponse {
     const payload = response.data;
     return {
-      accessToken: payload.accessToken,
-      refreshToken: payload.refreshToken,
-      tokenType: payload.tokenType ?? 'Bearer',
-      expiresIn: payload.expiresIn ?? 3600,
       userEmail: payload.admin.email,
       userId: payload.admin.id,
       roles: payload.admin.roles ?? [],
+      accessTokenExpiresInSeconds: payload.session.accessTokenExpiresInSeconds,
     };
   }
 

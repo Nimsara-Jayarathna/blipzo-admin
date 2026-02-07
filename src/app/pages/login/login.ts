@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, take } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 
 type LoginState = 'idle' | 'submitting' | 'success' | 'error';
@@ -28,9 +28,14 @@ export class Login {
   private successRedirectTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    if (this.authService.isAuthenticated()) {
-      void this.router.navigate(['/dashboard']);
-    }
+    this.authService
+      .checkSession()
+      .pipe(take(1))
+      .subscribe((authenticated) => {
+        if (authenticated) {
+          void this.router.navigate(['/dashboard']);
+        }
+      });
   }
 
   ngOnDestroy(): void {
