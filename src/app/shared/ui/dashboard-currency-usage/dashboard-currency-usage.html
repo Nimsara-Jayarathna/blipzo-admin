@@ -1,0 +1,41 @@
+<section class="usage-card">
+  <header>
+    <h3>Currency Usage Distribution</h3>
+    <div class="period-switch">
+      <button
+        type="button"
+        [class.active]="selectedPeriod() === '30d'"
+        [disabled]="isLoading()"
+        (click)="onPeriodSelect('30d')"
+      >
+        30 Days
+      </button>
+      <button
+        type="button"
+        [class.active]="selectedPeriod() === '90d'"
+        [disabled]="isLoading()"
+        (click)="onPeriodSelect('90d')"
+      >
+        90 Days
+      </button>
+    </div>
+  </header>
+
+  <div class="usage-content">
+    <div class="ring">
+      <div class="ring-inner">
+        <span>Total</span>
+        <strong>${{ usage().totalAmount.toLocaleString() }}</strong>
+      </div>
+    </div>
+
+    <div class="legend">
+      @for (segment of usage().segments; track segment.code) {
+        <div class="legend-item">
+          <div class="bar"></div>
+          <span>{{ segment.code }} ({{ segment.percent }}%)</span>
+        </div>
+      }
+    </div>
+  </div>
+</section>

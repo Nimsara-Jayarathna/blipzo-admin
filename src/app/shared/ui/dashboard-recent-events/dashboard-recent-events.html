@@ -1,0 +1,31 @@
+<section class="events-card">
+  <header>
+    <h3>Recent System Events</h3>
+    <button type="button">View All</button>
+  </header>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Level</th>
+          <th>Event</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (event of events(); track event.message + event.occurredAt) {
+          <tr>
+            <td>
+              <span class="level-chip" [class]="levelClass(event.level)">
+                {{ event.level }}
+              </span>
+            </td>
+            <td>{{ event.message }}</td>
+            <td>{{ event.occurredAt }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

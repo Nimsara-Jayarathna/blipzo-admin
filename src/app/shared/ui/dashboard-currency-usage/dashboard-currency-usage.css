@@ -1,0 +1,135 @@
+.usage-card {
+  background: #111924;
+  border: 1px solid #2f3b4e;
+  border-radius: 0.9rem;
+  padding: 1rem;
+  min-height: 27rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  margin: 0;
+  color: #f4f8ff;
+  font-size: 1.65rem;
+}
+
+.period-switch {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.period-switch button {
+  background: transparent;
+  border: 1px solid #334157;
+  color: #95a3ba;
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.period-switch button.active {
+  border-color: #4c8ee2;
+  color: #e3ecfb;
+  background: #1c2c46;
+}
+
+.period-switch button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.usage-content {
+  border: 1px solid #2f3b4e;
+  border-radius: 0.9rem;
+  min-height: 22rem;
+  display: grid;
+  place-items: center;
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+.ring {
+  width: 8.4rem;
+  height: 8.4rem;
+  border-radius: 50%;
+  border: 0.55rem solid #293850;
+  position: relative;
+}
+
+.ring::before {
+  content: '';
+  position: absolute;
+  inset: -0.55rem;
+  border-radius: 50%;
+  border: 0.55rem solid transparent;
+  border-top-color: #2196f3;
+  border-right-color: rgba(33, 150, 243, 0.55);
+}
+
+.ring-inner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+
+.ring-inner span {
+  color: #8ea0bb;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ring-inner strong {
+  color: #f8fbff;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.legend {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legend-item {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.legend-item span {
+  color: #8ea0bb;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.bar {
+  width: 3.2rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #2196f3;
+}
+
+.legend-item:nth-child(2) .bar {
+  background: rgba(33, 150, 243, 0.5);
+}
+
+.legend-item:nth-child(3) .bar {
+  background: #4a5a74;
+}
+
+@media (max-width: 860px) {
+  h3 {
+    font-size: 1.35rem;
+  }
+}

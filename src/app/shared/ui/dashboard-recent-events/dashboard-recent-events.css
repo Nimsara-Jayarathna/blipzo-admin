@@ -1,0 +1,93 @@
+.events-card {
+  background: #111924;
+  border: 1px solid #2f3b4e;
+  border-radius: 0.9rem;
+  padding: 1rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+h3 {
+  margin: 0;
+  color: #f4f8ff;
+  font-size: 1.25rem;
+}
+
+header button {
+  border: 0;
+  background: transparent;
+  color: #2ea0ff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.table-wrap {
+  border: 1px solid #2f3b4e;
+  border-radius: 0.7rem;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #1a2536;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.72rem 0.82rem;
+}
+
+th {
+  color: #91a2bd;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+td {
+  color: #e7eefc;
+  border-top: 1px solid #2a364b;
+  font-size: 0.88rem;
+}
+
+tbody tr:hover {
+  background: #1a2538;
+}
+
+.level-chip {
+  border-radius: 0.33rem;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.43rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.level-chip.error {
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.14);
+}
+
+.level-chip.warn {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.level-chip.info {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.14);
+}
+
+.level-chip.update {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.14);
+}

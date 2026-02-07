@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { DashboardHome } from './pages/dashboard/home/dashboard-home';
 import { Categories } from './pages/dashboard/categories/categories';
 import { Currencies } from './pages/dashboard/currencies/currencies';
 import { System } from './pages/dashboard/system/system';
@@ -14,7 +15,7 @@ export const routes: Routes = [
     component: Dashboard,
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'users', pathMatch: 'full' },
+      { path: '', component: DashboardHome },
       { path: 'users', component: Users },
       { path: 'currencies', component: Currencies },
       { path: 'categories', component: Categories },

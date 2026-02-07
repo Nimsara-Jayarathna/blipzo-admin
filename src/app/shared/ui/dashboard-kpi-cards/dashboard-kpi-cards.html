@@ -1,0 +1,35 @@
+<section class="kpi-grid">
+  <article class="kpi-card">
+    <p>Total Users</p>
+    <div>
+      <strong>{{ summary().totalUsers.value }}</strong>
+      <span class="delta positive">+{{ summary().totalUsers.deltaPct }}%</span>
+    </div>
+  </article>
+
+  <article class="kpi-card">
+    <p>Active Users</p>
+    <div>
+      <strong>{{ summary().activeUsers.value }}</strong>
+      <span class="delta positive">+{{ summary().activeUsers.deltaPct }}%</span>
+    </div>
+  </article>
+
+  <article class="kpi-card">
+    <p>Default Currency</p>
+    <div>
+      <strong>{{ summary().defaultCurrency.value }}</strong>
+      <span class="delta neutral">{{ summary().defaultCurrency.deltaPct }}%</span>
+    </div>
+  </article>
+
+  <article class="kpi-card">
+    <p>Error Count</p>
+    <div>
+      <strong>{{ summary().errorCount.value }}</strong>
+      <span class="delta" [class.negative]="summary().errorCount.deltaPct < 0">
+        {{ summary().errorCount.deltaPct }}%
+      </span>
+    </div>
+  </article>
+</section>

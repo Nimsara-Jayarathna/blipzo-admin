@@ -1,15 +1,34 @@
 <div class="dashboard-layout">
   <aside class="dashboard-sidebar">
-    <h2 class="dashboard-title">Blipzo Admin</h2>
+    <div class="brand">
+      <div class="brand-logo">B</div>
+      <h2 class="dashboard-title">BLIPZO ADMIN</h2>
+    </div>
+
     <nav class="dashboard-nav">
+      <a routerLink="/dashboard" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active-link">
+        Dashboard
+      </a>
       <a routerLink="users" routerLinkActive="active-link">Users</a>
       <a routerLink="currencies" routerLinkActive="active-link">Currencies</a>
       <a routerLink="categories" routerLinkActive="active-link">Categories</a>
       <a routerLink="system" routerLinkActive="active-link">System</a>
     </nav>
+
+    <button class="logout-button" type="button" [disabled]="isSigningOut" (click)="onLogout()">
+      {{ isSigningOut ? 'Logging out...' : 'Logout' }}
+    </button>
   </aside>
 
   <main class="dashboard-content">
+    <header class="dashboard-header">
+      <div class="dashboard-header-main">
+        <h1>System Dashboard</h1>
+        <span>Admin Access</span>
+      </div>
+      <div class="dashboard-user">sys_admin_01</div>
+    </header>
+
     <router-outlet></router-outlet>
   </main>
 </div>
