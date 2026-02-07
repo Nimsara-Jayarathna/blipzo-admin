@@ -10,10 +10,12 @@ import {
 } from '../../../core/users/models/users.models';
 import { environment } from '../../../../environments/environment';
 import { UsersService } from '../../../core/users/users.service';
+import { AdminConfirmDialogComponent } from '../../../shared/ui/admin-confirm-dialog/admin-confirm-dialog';
+import { AdminUserProfileModalComponent } from '../../../shared/ui/admin-user-profile-modal/admin-user-profile-modal';
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminConfirmDialogComponent, AdminUserProfileModalComponent],
   templateUrl: './users.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -272,19 +274,6 @@ export class Users implements OnInit {
     return userId.length > 8 ? userId.slice(-6).toUpperCase() : userId.toUpperCase();
   }
 
-  formatDateTime(value: string | null): string {
-    if (!value) {
-      return 'N/A';
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return 'N/A';
-    }
-
-    return date.toLocaleString();
-  }
-
   get totalPages(): number {
     if (this.filteredUsers.length === 0) {
       return 1;
@@ -353,10 +342,6 @@ export class Users implements OnInit {
 
   trackByUserId(_: number, user: AdminUser): string {
     return user.id;
-  }
-
-  trackByActivityIndex(index: number): number {
-    return index;
   }
 
   private loadUsers(): void {
