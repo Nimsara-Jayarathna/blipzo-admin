@@ -45,9 +45,19 @@ Response `data`:
 
 Returns current backup status for polling.
 
+### `GET /system/backup/{id}/download`
+
+Downloads the generated backup artifact when job status is `success`.
+
 ### `POST /system/backup/{id}/cancel`
 
 Cancels a running backup job.
+
+## Storage Location
+
+- Backups are stored on the API server filesystem.
+- Default directory: `blipzo-api/storage/backups`
+- Override with env: `ADMIN_BACKUP_STORAGE_DIR`
 
 ### `GET /system/delete-requests`
 

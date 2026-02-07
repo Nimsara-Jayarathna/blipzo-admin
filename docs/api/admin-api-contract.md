@@ -47,6 +47,7 @@ Resulting base path:
 - Admin provider usage history: `GET /api/v1/admin/system/provider-usage`
 - Admin run backup: `POST /api/v1/admin/system/backup/run`
 - Admin backup status: `GET /api/v1/admin/system/backup/{id}`
+- Admin backup download: `GET /api/v1/admin/system/backup/{id}/download`
 - Admin cancel backup: `POST /api/v1/admin/system/backup/{id}/cancel`
 - Admin delete requests list: `GET /api/v1/admin/system/delete-requests`
 - Admin delete request decision: `POST /api/v1/admin/system/delete-requests/{id}/decision`

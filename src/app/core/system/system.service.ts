@@ -70,6 +70,10 @@ export class SystemService {
       .pipe(map((response) => response.data));
   }
 
+  getBackupDownloadUrl(backupId: string): string {
+    return adminApiUrl(`system/backup/${backupId}/download`);
+  }
+
   getDeleteRequests(status?: 'pending' | 'approved' | 'denied'): Observable<DeleteRequestsResponse> {
     const url = status ? adminApiUrl(`system/delete-requests?status=${status}`) : adminApiUrl('system/delete-requests');
     return this.http

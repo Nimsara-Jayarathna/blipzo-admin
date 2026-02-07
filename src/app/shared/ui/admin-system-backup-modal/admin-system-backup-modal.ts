@@ -10,9 +10,11 @@ export class AdminSystemBackupModalComponent {
   @Input() open = false;
   @Input() job: BackupJob | null = null;
   @Input() cancelLoading = false;
+  @Input() downloadAvailable = false;
 
   @Output() close = new EventEmitter<void>();
   @Output() cancelBackup = new EventEmitter<void>();
+  @Output() downloadBackup = new EventEmitter<void>();
 
   emitClose(): void {
     if (this.job?.status === 'running') {
@@ -26,6 +28,13 @@ export class AdminSystemBackupModalComponent {
       return;
     }
     this.cancelBackup.emit();
+  }
+
+  emitDownloadBackup(): void {
+    if (!this.downloadAvailable || this.job?.status !== 'success') {
+      return;
+    }
+    this.downloadBackup.emit();
   }
 
   progressWidth(): string {

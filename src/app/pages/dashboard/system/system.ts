@@ -172,6 +172,15 @@ export class System implements OnInit, OnDestroy {
       });
   }
 
+  downloadBackup(): void {
+    if (!this.backupJob || this.backupJob.status !== 'success') {
+      return;
+    }
+
+    const url = this.systemService.getBackupDownloadUrl(this.backupJob.id);
+    window.open(url, '_blank', 'noopener');
+  }
+
   openDeleteDecision(request: DeleteRequest, decision: 'approve' | 'deny'): void {
     this.pendingDecision = { request, decision };
     this.isDecisionConfirmOpen = true;

@@ -79,6 +79,7 @@ export interface BackupJob {
   startedAt: string | null;
   completedAt: string | null;
   fileName: string | null;
+  hasDownload?: boolean;
   fileSizeBytes: number | null;
   errorCode: string | null;
   errorMessage: string | null;

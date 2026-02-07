@@ -43,6 +43,16 @@
           <button type="button" (click)="emitClose()" class="h-10 flex-1 rounded-lg bg-[#2d9dff] text-sm font-bold text-white transition hover:bg-[#2288e4]">
             Close
           </button>
+          @if (job.status === 'success') {
+            <button
+              type="button"
+              (click)="emitDownloadBackup()"
+              [disabled]="!downloadAvailable"
+              class="h-10 flex-1 rounded-lg border border-[#4b607b] bg-[#2b3d54] text-sm font-bold text-[#e9f2ff] transition hover:bg-[#365070] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Download Backup
+            </button>
+          }
         }
       </div>
     </div>

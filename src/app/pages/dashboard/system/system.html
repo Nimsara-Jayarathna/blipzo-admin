@@ -224,7 +224,9 @@
 <app-admin-system-backup-modal
   [open]="isBackupModalOpen"
   [job]="backupJob"
+  [downloadAvailable]="backupJob?.hasDownload === true"
   [cancelLoading]="isBackupCanceling"
   (close)="closeBackupModal()"
   (cancelBackup)="cancelBackup()"
+  (downloadBackup)="downloadBackup()"
 ></app-admin-system-backup-modal>
