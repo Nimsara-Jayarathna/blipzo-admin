@@ -6,4 +6,5 @@ export const environment = {
   apiPrefix: 'api',
   adminApiSegment: 'admin',
   adminUsersPageSize: 10,
+  adminCurrenciesPageSize: 10,
 };
