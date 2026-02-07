@@ -1,10 +1,188 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { finalize, take } from 'rxjs';
+import { AdminUser, UserStatus } from '../../../core/users/models/users.models';
+import { environment } from '../../../../environments/environment';
+import { UsersService } from '../../../core/users/users.service';
 
 @Component({
   selector: 'app-users',
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './users.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Users {
+export class Users implements OnInit {
+  private readonly usersService = inject(UsersService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly fb = inject(FormBuilder);
 
+  readonly pageSize = Math.max(1, Number(environment.adminUsersPageSize) || 10);
+
+  readonly filterForm = this.fb.nonNullable.group({
+    name: '',
+    email: '',
+    userId: '',
+    status: 'ALL' as 'ALL' | UserStatus,
+  });
+
+  readonly statusOptions: Array<'ALL' | UserStatus> = ['ALL', 'ACTIVE', 'INACTIVE', 'SUSPENDED'];
+
+  allUsers: AdminUser[] = [];
+  filteredUsers: AdminUser[] = [];
+  pagedUsers: AdminUser[] = [];
+
+  isLoading = true;
+  errorMessage = '';
+  currentPage = 1;
+
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  onApplyFilter(): void {
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  onPageChange(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) {
+      return;
+    }
+
+    this.currentPage = page;
+    this.updatePagedUsers();
+  }
+
+  onRetry(): void {
+    this.loadUsers();
+  }
+
+  get totalPages(): number {
+    if (this.filteredUsers.length === 0) {
+      return 1;
+    }
+    return Math.ceil(this.filteredUsers.length / this.pageSize);
+  }
+
+  get showPagination(): boolean {
+    return this.filteredUsers.length > this.pageSize;
+  }
+
+  get showingStart(): number {
+    if (this.filteredUsers.length === 0) {
+      return 0;
+    }
+    return (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get showingEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.filteredUsers.length);
+  }
+
+  get visiblePages(): number[] {
+    const maxVisible = 3;
+    const total = this.totalPages;
+    if (total <= maxVisible) {
+      return Array.from({ length: total }, (_, idx) => idx + 1);
+    }
+
+    let start = Math.max(1, this.currentPage - 1);
+    let end = start + maxVisible - 1;
+
+    if (end > total) {
+      end = total;
+      start = end - maxVisible + 1;
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, idx) => start + idx);
+  }
+
+  statusClass(status: UserStatus): string {
+    switch (status) {
+      case 'ACTIVE':
+        return 'text-[#10d39f]';
+      case 'INACTIVE':
+        return 'text-[#9aa9bb]';
+      case 'SUSPENDED':
+        return 'text-[#ff5a83]';
+      default:
+        return 'text-[#9aa9bb]';
+    }
+  }
+
+  statusDotClass(status: UserStatus): string {
+    switch (status) {
+      case 'ACTIVE':
+        return 'bg-[#10d39f]';
+      case 'INACTIVE':
+        return 'bg-[#9aa9bb]';
+      case 'SUSPENDED':
+        return 'bg-[#ff5a83]';
+      default:
+        return 'bg-[#9aa9bb]';
+    }
+  }
+
+  trackByUserId(_: number, user: AdminUser): string {
+    return user.id;
+  }
+
+  private loadUsers(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.cdr.markForCheck();
+
+    this.usersService
+      .getUsers()
+      .pipe(
+        take(1),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (data) => {
+          this.allUsers = data.users;
+          this.currentPage = 1;
+          this.applyFilters();
+        },
+        error: () => {
+          this.allUsers = [];
+          this.filteredUsers = [];
+          this.pagedUsers = [];
+          this.errorMessage = 'Unable to load users. Please retry.';
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  private applyFilters(): void {
+    const filter = this.filterForm.getRawValue();
+    const name = filter.name.trim().toLowerCase();
+    const email = filter.email.trim().toLowerCase();
+    const userId = filter.userId.trim().toLowerCase();
+
+    this.filteredUsers = this.allUsers.filter((user) => {
+      const matchesName = !name || user.name.toLowerCase().includes(name);
+      const matchesEmail = !email || user.email.toLowerCase().includes(email);
+      const matchesUserId = !userId || user.id.toLowerCase().includes(userId);
+      const matchesStatus = filter.status === 'ALL' || user.status === filter.status;
+
+      return matchesName && matchesEmail && matchesUserId && matchesStatus;
+    });
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+
+    this.updatePagedUsers();
+  }
+
+  private updatePagedUsers(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedUsers = this.filteredUsers.slice(start, start + this.pageSize);
+    this.cdr.markForCheck();
+  }
 }
