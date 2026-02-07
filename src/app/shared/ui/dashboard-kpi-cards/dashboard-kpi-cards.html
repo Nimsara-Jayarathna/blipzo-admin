@@ -1,8 +1,8 @@
 <section class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
   <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
-    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Total Users</p>
+    <p class="mb-3 mt-0 text-[0.9rem] font-medium text-[#9aabc2]">Total Users</p>
     <div class="flex items-end justify-between gap-3">
-      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().totalUsers.value) }}</strong>
+      <strong class="text-[2.35rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().totalUsers.value) }}</strong>
       <span class="rounded-md bg-[rgba(16,185,129,0.16)] px-2.5 py-1 text-[0.85rem] font-bold text-[#10d39f]">
         {{ deltaText(summary().totalUsers.deltaPct) }}%
       </span>
@@ -10,9 +10,9 @@
   </article>
 
   <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
-    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Active Users</p>
+    <p class="mb-3 mt-0 text-[0.9rem] font-medium text-[#9aabc2]">Active Users</p>
     <div class="flex items-end justify-between gap-3">
-      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().activeUsers.value) }}</strong>
+      <strong class="text-[2.35rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().activeUsers.value) }}</strong>
       <span class="rounded-md bg-[rgba(16,185,129,0.16)] px-2.5 py-1 text-[0.85rem] font-bold text-[#10d39f]">
         {{ deltaText(summary().activeUsers.deltaPct) }}%
       </span>
@@ -20,9 +20,9 @@
   </article>
 
   <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
-    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Default Currency</p>
+    <p class="mb-3 mt-0 text-[0.9rem] font-medium text-[#9aabc2]">Default Currency</p>
     <div class="flex items-end justify-between gap-3">
-      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ summary().defaultCurrency.value }}</strong>
+      <strong class="text-[2.35rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ summary().defaultCurrency.value }}</strong>
       <span class="rounded-md bg-[#1f2b3a] px-2.5 py-1 text-[0.85rem] font-bold text-[#a3afc2]">
         {{ summary().defaultCurrency.deltaPct }}%
       </span>
@@ -30,9 +30,9 @@
   </article>
 
   <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
-    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Error Count</p>
+    <p class="mb-3 mt-0 text-[0.9rem] font-medium text-[#9aabc2]">Error Count</p>
     <div class="flex items-end justify-between gap-3">
-      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().errorCount.value) }}</strong>
+      <strong class="text-[2.35rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().errorCount.value) }}</strong>
       <span [class]="errorDeltaClass()">
         {{ deltaText(summary().errorCount.deltaPct) }}%
       </span>
