@@ -1,1 +1,232 @@
-<p>system works!</p>
+@if (isLoading) {
+  <div class="flex min-h-[18rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]">
+    Loading system monitoring...
+  </div>
+} @else if (errorMessage && !snapshot) {
+  <div class="flex min-h-[18rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]">
+    <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
+    <button
+      type="button"
+      (click)="onRetry()"
+      class="rounded-lg border border-[#3a4a5f] bg-[#253349] px-4 py-2 text-sm font-bold text-[#e3edfb] transition hover:bg-[#30415b]"
+    >
+      Retry
+    </button>
+  </div>
+} @else if (snapshot) {
+  <section class="flex flex-col gap-8">
+    <div>
+      <h3 class="m-0 text-[2rem] font-bold tracking-tight text-[#f2f8ff]">System Health & Monitoring</h3>
+      <p class="mt-1 text-[1rem] text-[#9aabc2]">Real-time infrastructure performance and administrative workflows.</p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="rounded-xl border border-[#60384a] bg-[#2a1b24] px-4 py-3 text-sm text-[#ffb2c8]">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <article class="flex flex-col gap-5 rounded-2xl border border-[#32455d] bg-[#0b131f] p-6">
+        <div class="flex items-center justify-between">
+          <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Email/SMS Provider Health</h4>
+          <span [class]="providerStatusClass()">{{ snapshot.providerHealth.status }}</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Send Rate</p>
+            <p class="mt-1 text-2xl font-bold text-[#f4f9ff]">{{ snapshot.providerHealth.sendRatePerDay }}/day</p>
+          </div>
+          <div>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Failed Sends</p>
+            <p class="mt-1 text-2xl font-bold text-[#ff6f98]">{{ snapshot.providerHealth.failedToday }}</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="mb-1 flex items-center justify-between">
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Daily Usage</span>
+            <span class="text-xs text-[#c9d8eb]">{{ snapshot.providerHealth.usagePct }}%</span>
+          </div>
+          <div class="h-2 overflow-hidden rounded-full bg-[#2b3a4f]">
+            <div class="h-full bg-[#2e9bff]" [style.width.%]="snapshot.providerHealth.usagePct"></div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="openProviderUsage()"
+          class="mt-auto flex w-full items-center justify-center gap-2 rounded-lg border border-[#4b607b] bg-[#2b3d54] px-4 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-[#e9f2ff] transition hover:bg-[#365070]"
+        >
+          <span class="material-symbols-outlined text-[16px]">monitoring</span>
+          View Analytics
+        </button>
+      </article>
+
+      <article class="flex flex-col gap-5 rounded-2xl border border-[#32455d] bg-[#0b131f] p-6">
+        <div class="flex items-center justify-between">
+          <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">DB Health & Storage</h4>
+          <span class="inline-flex items-center gap-2 text-xs font-bold uppercase text-[#10d39f]">
+            <span class="h-2 w-2 rounded-full bg-[#10d39f]"></span>
+            {{ snapshot.dbHealth.connected ? 'Connected' : 'Disconnected' }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Total Size</p>
+            <p class="mt-1 text-lg font-bold text-[#f4f9ff]">{{ snapshot.dbHealth.totalSizeGb }} GB</p>
+          </div>
+          <div>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Data Size</p>
+            <p class="mt-1 text-sm font-semibold text-[#dce8f8]">{{ snapshot.dbHealth.dataSizeMb }} MB</p>
+          </div>
+          <div>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Index Size</p>
+            <p class="mt-1 text-sm font-semibold text-[#dce8f8]">{{ snapshot.dbHealth.indexSizeMb }} MB</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="mb-1 flex items-center justify-between">
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Storage Capacity</span>
+            <span class="text-xs text-[#c9d8eb]">{{ snapshot.dbHealth.usedPct }}%</span>
+          </div>
+          <div class="h-2 overflow-hidden rounded-full bg-[#2b3a4f]">
+            <div class="h-full bg-[#2e9bff]" [style.width.%]="snapshot.dbHealth.usedPct"></div>
+          </div>
+          <p class="mt-2 text-[0.72rem] text-[#9aabc2]">Remaining: {{ snapshot.dbHealth.remainingGb }} GB / {{ snapshot.dbHealth.capacityGb }} GB</p>
+        </div>
+      </article>
+    </div>
+
+    <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="grid h-11 w-11 place-items-center rounded-lg bg-[#1a2534] text-[#8ea1bb]">
+            <span class="material-symbols-outlined">backup</span>
+          </div>
+          <div>
+            <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">DB Backup</h4>
+            <p class="mt-1 text-sm text-[#d9e4f2]">Last Backup: {{ formatLastBackupDate() }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span [class]="backupStatusChipClass()">{{ snapshot.backup.lastBackupStatus }}</span>
+          <button
+            type="button"
+            (click)="openBackupConfirm()"
+            class="flex items-center gap-2 rounded-lg border border-[#4b607b] bg-[#2b3d54] px-5 py-2.5 text-sm font-bold text-[#f0f6ff] transition hover:bg-[#365070]"
+          >
+            <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+            Run Backup Now
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <section>
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="m-0 text-[1.5rem] font-bold text-[#f2f8ff]">Delete Requests Workflow</h3>
+        <span class="text-xs uppercase tracking-[0.08em] text-[#9aabc2]">Pending: {{ snapshot.deleteRequests.pending }}</span>
+      </div>
+
+      <div class="overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f]">
+        <table class="w-full min-w-[900px] border-collapse">
+          <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
+            <tr>
+              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">User</th>
+              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Request Date</th>
+              <th class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</th>
+              <th class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (deleteRequests.length === 0) {
+              <tr>
+                <td colspan="4" class="px-6 py-8 text-sm text-[#95a7bf]">No pending delete requests.</td>
+              </tr>
+            } @else {
+              @for (request of deleteRequests; track request.id) {
+                <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
+                  <td class="px-6 py-4">
+                    <div class="flex flex-col">
+                      <span class="text-sm font-semibold text-[#f4f8ff]">{{ request.userName }}</span>
+                      <span class="text-xs text-[#8fa3bf]">{{ request.userEmail }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-[#9fb2cb]">{{ formatDate(request.requestedAt) }}</td>
+                  <td class="px-6 py-4 text-center">
+                    <span [class]="statusClass(request.status)">{{ request.status }}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="openDeleteDecision(request, 'approve')"
+                        class="rounded border border-[rgba(16,185,129,0.24)] bg-[rgba(16,185,129,0.1)] px-3 py-1 text-[0.68rem] font-bold uppercase text-[#10d39f] transition hover:bg-[rgba(16,185,129,0.2)]"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        (click)="openDeleteDecision(request, 'deny')"
+                        class="rounded border border-[rgba(244,63,94,0.24)] bg-[rgba(244,63,94,0.1)] px-3 py-1 text-[0.68rem] font-bold uppercase text-[#ff547f] transition hover:bg-[rgba(244,63,94,0.2)]"
+                      >
+                        Deny
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+}
+
+<app-admin-confirm-dialog
+  [open]="isBackupConfirmOpen"
+  [title]="'Confirm Manual Backup'"
+  [message]="'Start a manual database backup now? This can take a few minutes.'"
+  [cancelLabel]="'Cancel'"
+  [confirmLabel]="'Start Backup'"
+  [loading]="isBackupStarting"
+  tone="neutral"
+  (cancel)="closeBackupConfirm()"
+  (confirm)="confirmRunBackup()"
+></app-admin-confirm-dialog>
+
+<app-admin-confirm-dialog
+  [open]="isDecisionConfirmOpen"
+  [title]="confirmDecisionTitle()"
+  [message]="confirmDecisionMessage()"
+  [cancelLabel]="'Cancel'"
+  [confirmLabel]="confirmDecisionButtonLabel()"
+  [loading]="isDecisionSaving"
+  [tone]="confirmDecisionTone()"
+  (cancel)="closeDeleteDecision()"
+  (confirm)="confirmDeleteDecision()"
+></app-admin-confirm-dialog>
+
+<app-admin-system-provider-usage-modal
+  [open]="isProviderModalOpen"
+  [loading]="isProviderLoading"
+  [errorMessage]="providerErrorMessage"
+  [data]="providerUsage"
+  (close)="closeProviderUsage()"
+></app-admin-system-provider-usage-modal>
+
+<app-admin-system-backup-modal
+  [open]="isBackupModalOpen"
+  [job]="backupJob"
+  [downloadAvailable]="backupJob?.hasDownload === true"
+  [cancelLoading]="isBackupCanceling"
+  (close)="closeBackupModal()"
+  (cancelBackup)="cancelBackup()"
+  (downloadBackup)="downloadBackup()"
+></app-admin-system-backup-modal>
