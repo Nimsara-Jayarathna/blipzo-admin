@@ -4,14 +4,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize, take } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
-import { AuthStatusModalComponent } from '../../shared/ui/auth-status-modal/auth-status-modal';
+import { HttpRequestFeedbackService } from '../../core/http/http-request-feedback.service';
 import { LoginFormComponent } from '../../shared/ui/login-form/login-form';
 
 type LoginState = 'idle' | 'loading' | 'error';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, LoginFormComponent, AuthStatusModalComponent],
+  imports: [ReactiveFormsModule, LoginFormComponent],
   templateUrl: './login.html',
   styleUrl: './login.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +21,7 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly requestFeedbackService = inject(HttpRequestFeedbackService);
 
   readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -43,6 +44,11 @@ export class Login {
   onSubmit(): void {
     if (this.loginForm.invalid || this.loginForm.disabled) {
       this.loginForm.markAllAsTouched();
+      if (this.loginForm.invalid) {
+        this.requestFeedbackService.showError(
+          'Please provide a valid email and password before submitting.',
+        );
+      }
       return;
     }
 
