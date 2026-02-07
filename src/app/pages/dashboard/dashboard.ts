@@ -64,7 +64,7 @@ export class Dashboard {
     }
 
     if (url.includes('/dashboard/categories')) {
-      this.pageTitle = 'Categories';
+      this.pageTitle = 'Category Management';
       this.pageChip = '/admin/categories';
       return;
     }

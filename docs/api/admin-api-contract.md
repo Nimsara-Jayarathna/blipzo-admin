@@ -37,6 +37,12 @@ Resulting base path:
 - Admin currency update: `PATCH /api/v1/admin/currencies/{id}`
 - Admin currency set default: `POST /api/v1/admin/currencies/{id}/set-default`
 - Admin currency toggle status: `POST /api/v1/admin/currencies/{id}/toggle-status`
+- Admin categories list: `GET /api/v1/admin/categories`
+- Admin category create: `POST /api/v1/admin/categories`
+- Admin category update: `PATCH /api/v1/admin/categories/{id}`
+- Admin category set default: `POST /api/v1/admin/categories/{id}/set-default`
+- Admin category delete: `DELETE /api/v1/admin/categories/{id}`
+- Admin category settings update: `PATCH /api/v1/admin/categories/settings`
 
 ## Detailed Endpoint Docs
 
@@ -48,6 +54,8 @@ Resulting base path:
   - `docs/api/users-api.md`
 - Admin currencies endpoints:
   - `docs/api/currencies-api.md`
+- Admin categories endpoints:
+  - `docs/api/categories-api.md`
 
 ## Naming Conventions
 
