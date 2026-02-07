@@ -4,11 +4,12 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize, take } from 'rxjs';
 import { CategoriesService } from '../../../core/categories/categories.service';
 import { AdminCategory, AdminCategoriesData, CategoryType } from '../../../core/categories/models/categories.models';
+import { AdminCategoryManagementComponent } from '../../../shared/ui/admin-category-management/admin-category-management';
 import { AdminCategoryModalComponent } from '../../../shared/ui/admin-category-modal/admin-category-modal';
 
 @Component({
   selector: 'app-categories',
-  imports: [CommonModule, ReactiveFormsModule, AdminCategoryModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, AdminCategoryManagementComponent, AdminCategoryModalComponent],
   templateUrl: './categories.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -216,16 +217,6 @@ export class Categories implements OnInit {
 
   modalSubmitLabel(): string {
     return this.editingCategoryId ? 'Save Changes' : 'Add Category';
-  }
-
-  typeClass(type: CategoryType): string {
-    return type === 'income'
-      ? 'rounded bg-[rgba(16,185,129,0.12)] px-2 py-0.5 text-[0.68rem] font-bold uppercase text-[#10d39f]'
-      : 'rounded bg-[rgba(244,63,94,0.12)] px-2 py-0.5 text-[0.68rem] font-bold uppercase text-[#ff547f]';
-  }
-
-  trackByCategoryId(_: number, category: AdminCategory): string {
-    return category.id;
   }
 
   private loadCategories(): void {
