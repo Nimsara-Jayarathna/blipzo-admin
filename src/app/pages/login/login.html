@@ -9,6 +9,12 @@
       </header>
 
       <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        @if (loginState === 'error' && errorMessage) {
+          <p class="submit-error error-banner" role="alert">
+            {{ errorMessage }}
+          </p>
+        }
+
         <div class="field-group">
           <label for="email">Email Address</label>
           <div class="input-wrapper">
@@ -49,10 +55,6 @@
           }
         </div>
 
-        @if (errorMessage) {
-          <p class="submit-error">{{ errorMessage }}</p>
-        }
-
         <button type="submit" class="submit-button" [disabled]="isSubmitting">
           <span>{{ isSubmitting ? 'Signing in...' : 'Login' }}</span>
           <span aria-hidden="true">→</span>
@@ -60,4 +62,19 @@
       </form>
     </div>
   </main>
+
+  @if (loginState === 'success') {
+    <div class="success-overlay" role="status" aria-live="polite">
+      <div class="success-card">
+        <div class="success-icon" aria-hidden="true">✓</div>
+        <h2>Login Successful</h2>
+        <p>Redirecting to dashboard...</p>
+        <div class="success-dots" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  }
 </section>

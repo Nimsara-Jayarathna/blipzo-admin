@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 
+type LoginState = 'idle' | 'submitting' | 'success' | 'error';
+
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
@@ -20,12 +22,20 @@ export class Login {
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
+  loginState: LoginState = 'idle';
   isSubmitting = false;
   errorMessage = '';
+  private successRedirectTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
       void this.router.navigate(['/dashboard']);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.successRedirectTimer) {
+      clearTimeout(this.successRedirectTimer);
     }
   }
 
@@ -36,6 +46,7 @@ export class Login {
     }
 
     this.errorMessage = '';
+    this.loginState = 'submitting';
     this.isSubmitting = true;
 
     this.authService
@@ -43,10 +54,14 @@ export class Login {
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => {
-          void this.router.navigate(['/dashboard']);
+          this.loginState = 'success';
+          this.successRedirectTimer = setTimeout(() => {
+            void this.router.navigate(['/dashboard']);
+          }, 1200);
         },
-        error: () => {
-          this.errorMessage = 'Unable to sign in. Please verify your credentials and try again.';
+        error: (error: Error) => {
+          this.loginState = 'error';
+          this.errorMessage = error.message || 'Unable to sign in. Please verify your credentials.';
         },
       });
   }

@@ -30,4 +30,12 @@ describe('AuthService', () => {
     expect(service.isAuthenticated()).toBe(false);
     expect(service.getUserEmail()).toBeNull();
   });
+
+  it('should reject incorrect credentials', async () => {
+    await expect(
+      firstValueFrom(service.login({ email: 'admin@enterprise.com', password: 'wrong-pass' })),
+    ).rejects.toThrow('Incorrect email or password.');
+
+    expect(service.isAuthenticated()).toBe(false);
+  });
 });

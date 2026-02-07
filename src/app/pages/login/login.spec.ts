@@ -50,6 +50,24 @@ describe('Login', () => {
     component.onSubmit();
     await new Promise((resolve) => setTimeout(resolve, 300));
 
+    expect(component.loginState).toBe('success');
+    expect(navigateSpy).not.toHaveBeenCalled();
+    await new Promise((resolve) => setTimeout(resolve, 1300));
+
     expect(navigateSpy).toHaveBeenCalledWith(['/dashboard']);
+  });
+
+  it('should show error state for incorrect credentials', async () => {
+    component.loginForm.setValue({
+      email: 'admin@enterprise.com',
+      password: 'wrong-pass',
+    });
+
+    component.onSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    expect(component.loginState).toBe('error');
+    expect(component.errorMessage).toBe('Incorrect email or password.');
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 });
