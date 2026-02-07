@@ -89,6 +89,37 @@ Admin API contract (routes, request/response envelopes, login schema) is documen
 
 - `docs/api/admin-api-contract.md`
 
+### Dashboard API (aggregate endpoint)
+
+Dashboard first-load data is fetched from one endpoint with params:
+
+- `GET /api/{version}/admin/dashboard?period=30d|90d&eventsLimit=6`
+
+Frontend service:
+
+- `src/app/core/dashboard/dashboard.service.ts`
+
+Dashboard implementation:
+
+- Shell layout: `src/app/pages/dashboard/dashboard.ts`
+- Dashboard page: `src/app/pages/dashboard/home/dashboard-home.ts`
+- Reusable UI widgets: `src/app/shared/ui/dashboard-*`
+
+## Global API Request Modal
+
+All admin API requests are covered by a centralized blocking request modal.
+
+- Interceptor: `src/app/core/http/http-request-feedback.interceptor.ts`
+- Feedback service: `src/app/core/http/http-request-feedback.service.ts`
+- Global UI component: `src/app/shared/ui/global-request-feedback-modal`
+
+Context tokens for per-request behavior:
+
+- `SKIP_HTTP_REQUEST_FEEDBACK`
+- `SHOW_HTTP_REQUEST_SUCCESS`
+- `HTTP_REQUEST_LOADING_MESSAGE`
+- `HTTP_REQUEST_SUCCESS_MESSAGE`
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

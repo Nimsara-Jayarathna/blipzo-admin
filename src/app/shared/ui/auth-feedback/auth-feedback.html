@@ -1,15 +1,12 @@
 @if (state() !== 'idle') {
   <div
-    class="auth-feedback"
-    [class.feedback-loading]="state() === 'loading'"
-    [class.feedback-error]="state() === 'error'"
-    [class.feedback-success]="state() === 'success'"
+    [class]="feedbackClass()"
     [attr.role]="state() === 'error' ? 'alert' : 'status'"
     aria-live="polite"
   >
-    <span class="feedback-icon" aria-hidden="true">
+    <span class="inline-grid h-4 w-4 place-items-center text-[0.85rem] font-bold" aria-hidden="true">
       @if (state() === 'loading') {
-        <span class="spinner"></span>
+        <span class="h-[0.95rem] w-[0.95rem] animate-spin rounded-full border-2 border-[rgba(216,230,247,0.25)] border-t-[#d8e6f7]"></span>
       } @else if (state() === 'success') {
         ✓
       } @else {

@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-system',
   imports: [],
   templateUrl: './system.html',
-  styleUrl: './system.css',
 })
 export class System {
 

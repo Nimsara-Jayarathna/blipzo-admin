@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { Observable, TimeoutError, catchError, map, of, throwError, timeout } from 'rxjs';
 import { adminApiUrl } from '../api/api-endpoints';
+import {
+  HTTP_REQUEST_LOADING_MESSAGE,
+  HTTP_REQUEST_SUCCESS_MESSAGE,
+  SHOW_HTTP_REQUEST_SUCCESS,
+  SKIP_HTTP_REQUEST_FEEDBACK,
+} from '../http/http-request-feedback.context';
 import {
   AdminSessionApiData,
   AdminLoginApiData,
@@ -30,7 +36,10 @@ export class AuthService {
       .post<ApiSuccessResponse<AdminLoginApiData> | ApiErrorResponse>(
         LOGIN_URL,
         { email, password: payload.password },
-        { withCredentials: true },
+        {
+          withCredentials: true,
+          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Signing in...'),
+        },
       )
       .pipe(
         timeout(AUTH_REQUEST_TIMEOUT_MS),
@@ -48,12 +57,21 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(LOGOUT_URL, {}, { withCredentials: true });
+    return this.http.post<void>(LOGOUT_URL, {}, {
+      withCredentials: true,
+      context: new HttpContext()
+        .set(HTTP_REQUEST_LOADING_MESSAGE, 'Signing out...')
+        .set(SHOW_HTTP_REQUEST_SUCCESS, true)
+        .set(HTTP_REQUEST_SUCCESS_MESSAGE, 'Signed out successfully.'),
+    });
   }
 
   checkSession(): Observable<boolean> {
     return this.http
-      .get<ApiSuccessResponse<AdminSessionApiData>>(SESSION_URL, { withCredentials: true })
+      .get<ApiSuccessResponse<AdminSessionApiData>>(SESSION_URL, {
+        withCredentials: true,
+        context: new HttpContext().set(SKIP_HTTP_REQUEST_FEEDBACK, true),
+      })
       .pipe(
         map((response) => Boolean(response.data.authenticated)),
         catchError(() => of(false)),
