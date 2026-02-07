@@ -1,1 +1,224 @@
-<p>users works!</p>
+<section class="w-full">
+  @if (isLoading) {
+    <div class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]">
+      Loading users...
+    </div>
+  } @else if (errorMessage) {
+    <div class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]">
+      <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
+      <button
+        type="button"
+        (click)="onRetry()"
+        class="rounded-lg border border-[#3a4a5f] bg-[#253349] px-4 py-2 text-sm font-bold text-[#e3edfb] transition hover:bg-[#30415b]"
+      >
+        Retry
+      </button>
+    </div>
+  } @else {
+    <section class="mb-7 rounded-2xl border border-[#32455d] bg-[#0b131f] p-5">
+      <form
+        class="grid grid-cols-1 items-end gap-4 md:grid-cols-3 xl:grid-cols-[1fr_1fr_0.9fr_0.9fr_auto]"
+        [formGroup]="filterForm"
+        (ngSubmit)="onApplyFilter()"
+      >
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Name</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Search name..."
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] placeholder:text-[#6f8096] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Email</label>
+          <input
+            type="text"
+            formControlName="email"
+            placeholder="Search email..."
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] placeholder:text-[#6f8096] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">User ID</label>
+          <input
+            type="text"
+            formControlName="userId"
+            placeholder="e.g. 1004"
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] placeholder:text-[#6f8096] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</label>
+          <select
+            formControlName="status"
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+          >
+            @for (status of statusOptions; track status) {
+              <option [value]="status">{{ status === 'ALL' ? 'All Status' : status }}</option>
+            }
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          class="h-10 rounded-lg border border-[#445872] bg-[#2d3d53] px-5 text-sm font-bold uppercase tracking-wide text-[#f1f6ff] transition hover:bg-[#38506f]"
+        >
+          Apply Filter
+        </button>
+      </form>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f]">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] border-collapse">
+          <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
+            <tr>
+              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">ID</th>
+              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Name</th>
+              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Email</th>
+              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</th>
+              <th class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @if (pagedUsers.length === 0) {
+              <tr>
+                <td class="px-6 py-8 text-sm text-[#95a7bf]" colspan="5">No users found for selected filters.</td>
+              </tr>
+            } @else {
+              @for (user of pagedUsers; track trackByUserId($index, user)) {
+                <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
+                  <td class="px-6 py-4 text-base font-medium text-[#a8b8cf]">#{{ displayUserId(user.id) }}</td>
+                  <td class="px-6 py-4 text-base font-bold text-[#f4f8ff]">{{ user.name }}</td>
+                  <td class="px-6 py-4 text-sm text-[#93a7c1]">{{ user.email }}</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <span [class]="'h-2 w-2 rounded-full ' + statusDotClass(user.status)"></span>
+                      <span [class]="'text-sm font-medium uppercase ' + statusClass(user.status)">
+                        {{ user.status }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="relative px-6 py-4 text-right">
+                    <button
+                      type="button"
+                      (click)="toggleActionMenu(user.id)"
+                      class="text-[#9ab0ca] transition hover:text-[#d7e7fc]"
+                      aria-label="User actions"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">more_vert</span>
+                    </button>
+
+                    @if (actionMenuUserId === user.id) {
+                      <div class="absolute right-4 z-20 mt-2 w-40 rounded-lg border border-[#35506f] bg-[#101b2a] p-1 shadow-2xl">
+                        <button
+                          type="button"
+                          (click)="openUserProfile(user)"
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#d8e4f7] transition hover:bg-[#1f3249]"
+                        >
+                          <span class="material-symbols-outlined text-[16px]">visibility</span>
+                          View Profile
+                        </button>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-between border-t border-[#2b3a4f] px-6 py-4">
+        <span class="text-sm text-[#8ea1bb]">
+          Showing {{ showingStart }}-{{ showingEnd }} of {{ filteredUsers.length }} users
+        </span>
+
+        @if (showPagination) {
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="onPageChange(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              class="rounded-md bg-[#2b394c] px-3 py-1.5 text-xs font-bold text-[#dbe7f8] transition hover:bg-[#364b65] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            @for (page of visiblePages; track page) {
+              <button
+                type="button"
+                (click)="onPageChange(page)"
+                [class]="
+                  page === currentPage
+                    ? 'rounded-md bg-[#445872] px-3 py-1.5 text-xs font-bold text-white'
+                    : 'rounded-md px-3 py-1.5 text-xs font-bold text-[#dbe7f8] transition hover:bg-[#2b394c]'
+                "
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              type="button"
+              (click)="onPageChange(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              class="rounded-md bg-[#2b394c] px-3 py-1.5 text-xs font-bold text-[#dbe7f8] transition hover:bg-[#364b65] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</section>
+
+<app-admin-user-profile-modal
+  [open]="isProfileModalOpen"
+  [loading]="isProfileLoading"
+  [profile]="selectedUserProfile"
+  [activity]="selectedUserActivity"
+  [statusOptions]="profileStatusOptions"
+  [profileForm]="profileForm"
+  [saving]="isProfileSaving"
+  [errorMessage]="profileErrorMessage"
+  [successMessage]="profileSuccessMessage"
+  (close)="closeProfileModal()"
+  (save)="saveProfileChanges()"
+  (resetPassword)="openResetConfirm()"
+  (forceLogout)="openForceLogoutConfirm()"
+/>
+
+@if (isProfileModalOpen && isResetConfirmOpen && selectedUserProfile) {
+  <app-admin-confirm-dialog
+    [open]="true"
+    tone="neutral"
+    title="Confirm Reset Password"
+    [message]="'A temporary password will be generated for ' + selectedUserProfile.name + ' and sent to their registered email.'"
+    cancelLabel="Cancel"
+    confirmLabel="Reset Password"
+    [loading]="isResetLoading"
+    (cancel)="closeResetConfirm()"
+    (confirm)="confirmResetPassword()"
+  />
+}
+
+@if (isProfileModalOpen && isForceLogoutConfirmOpen && selectedUserProfile) {
+  <app-admin-confirm-dialog
+    [open]="true"
+    tone="danger"
+    title="Confirm Force Logout"
+    [message]="'This will invalidate all active tokens for ' + selectedUserProfile.name + ' immediately.'"
+    cancelLabel="Cancel"
+    confirmLabel="Confirm Logout"
+    [loading]="isForceLogoutLoading"
+    (cancel)="closeForceLogoutConfirm()"
+    (confirm)="confirmForceLogout()"
+  />
+}
