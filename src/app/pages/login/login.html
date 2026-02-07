@@ -8,54 +8,15 @@
         <h1>Admin Login</h1>
       </header>
 
-      <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-        <app-auth-feedback [state]="loginState" [message]="feedbackMessage"></app-auth-feedback>
-
-        <div class="field-group">
-          <label for="email">Email Address</label>
-          <div class="input-wrapper">
-            <span class="input-icon" aria-hidden="true">@</span>
-            <input
-              id="email"
-              type="email"
-              autocomplete="email"
-              formControlName="email"
-              placeholder="admin@enterprise.com"
-            />
-          </div>
-          @if (hasError('email', 'required')) {
-            <p class="field-error">Email is required.</p>
-          }
-          @if (hasError('email', 'email')) {
-            <p class="field-error">Enter a valid email address.</p>
-          }
-        </div>
-
-        <div class="field-group">
-          <label for="password">Password</label>
-          <div class="input-wrapper">
-            <span class="input-icon" aria-hidden="true">•</span>
-            <input
-              id="password"
-              type="password"
-              autocomplete="current-password"
-              formControlName="password"
-              placeholder="••••••••"
-            />
-          </div>
-          @if (hasError('password', 'required')) {
-            <p class="field-error">Password is required.</p>
-          }
-          @if (hasError('password', 'minlength')) {
-            <p class="field-error">Password must be at least 8 characters.</p>
-          }
-        </div>
-
-        <button type="submit" class="submit-button" [disabled]="isSubmitting">
-          <span>{{ isSubmitting ? 'Signing in...' : 'Login' }}</span>
-          <span aria-hidden="true">→</span>
-        </button>
-      </form>
+      <app-login-form
+        [form]="loginForm"
+        [errorMessage]="errorMessage"
+        (submitForm)="onSubmit()"
+      ></app-login-form>
     </div>
   </main>
+
+  @if (loginState === 'loading') {
+    <app-auth-status-modal state="loading"></app-auth-status-modal>
+  }
 </section>

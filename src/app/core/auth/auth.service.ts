@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, map, of, throwError } from 'rxjs';
+import { Observable, TimeoutError, catchError, map, of, throwError, timeout } from 'rxjs';
 import { adminApiUrl } from '../api/api-endpoints';
 import {
   AdminSessionApiData,
@@ -14,6 +14,7 @@ import {
 const LOGIN_URL = adminApiUrl('auth/login');
 const LOGOUT_URL = adminApiUrl('auth/logout');
 const SESSION_URL = adminApiUrl('auth/session');
+const AUTH_REQUEST_TIMEOUT_MS = 10000;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -26,14 +27,21 @@ export class AuthService {
     }
 
     return this.http
-      .post<ApiSuccessResponse<AdminLoginApiData>>(
+      .post<ApiSuccessResponse<AdminLoginApiData> | ApiErrorResponse>(
         LOGIN_URL,
         { email, password: payload.password },
         { withCredentials: true },
       )
       .pipe(
-        map((response) => this.normalizeLoginResponse(response)),
-        catchError((error: HttpErrorResponse) =>
+        timeout(AUTH_REQUEST_TIMEOUT_MS),
+        map((response) => {
+          if (!response.success) {
+            throw new Error(response.message || 'Unable to sign in. Please try again.');
+          }
+
+          return this.normalizeLoginResponse(response);
+        }),
+        catchError((error: unknown) =>
           throwError(() => new Error(this.extractErrorMessage(error))),
         ),
       );
@@ -56,6 +64,10 @@ export class AuthService {
     response: ApiSuccessResponse<AdminLoginApiData>,
   ): LoginResponse {
     const payload = response.data;
+    if (!payload?.admin?.id || !payload?.admin?.email || !payload?.session) {
+      throw new Error('Invalid login response from server.');
+    }
+
     return {
       userEmail: payload.admin.email,
       userId: payload.admin.id,
@@ -64,17 +76,38 @@ export class AuthService {
     };
   }
 
-  private extractErrorMessage(error: HttpErrorResponse): string {
+  private extractErrorMessage(error: unknown): string {
     const fallbackMessage = 'Unable to sign in. Please verify your credentials and try again.';
-    if (!error.error) {
-      return fallbackMessage;
+    if (error instanceof TimeoutError) {
+      return 'Login request timed out. Please try again.';
     }
 
-    if (typeof error.error === 'string') {
-      return error.error;
+    if (error instanceof HttpErrorResponse) {
+      if (!error.error) {
+        return error.message || fallbackMessage;
+      }
+
+      if (typeof error.error === 'string') {
+        return error.error || error.message || fallbackMessage;
+      }
+
+      const apiError = error.error as Partial<ApiErrorResponse> & {
+        error?: { message?: string };
+        details?: { message?: string };
+      };
+      return (
+        apiError.message ||
+        apiError.error?.message ||
+        apiError.details?.message ||
+        error.message ||
+        fallbackMessage
+      );
     }
 
-    const apiError = error.error as Partial<ApiErrorResponse>;
-    return apiError.message || fallbackMessage;
+    if (error instanceof Error) {
+      return error.message || fallbackMessage;
+    }
+
+    return fallbackMessage;
   }
 }

@@ -74,6 +74,19 @@ describe('AuthService', () => {
     await expect(loginPromise).rejects.toThrow('Incorrect email or password.');
   });
 
+  it('should handle business error response even with 200 status', async () => {
+    const loginPromise = firstValueFrom(
+      service.login({ email: 'admin@enterprise.com', password: 'wrong-pass' }),
+    );
+
+    httpMock.expectOne(adminApiUrl('auth/login')).flush({
+      success: false,
+      message: 'Incorrect email or password.',
+    });
+
+    await expect(loginPromise).rejects.toThrow('Incorrect email or password.');
+  });
+
   it('should return false when session check fails', async () => {
     const sessionPromise = firstValueFrom(service.checkSession());
     httpMock

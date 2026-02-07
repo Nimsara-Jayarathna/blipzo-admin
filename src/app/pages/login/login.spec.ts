@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { Observable, of, throwError } from 'rxjs';
+import { Subject, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
 import { Login } from './login';
@@ -40,13 +40,14 @@ describe('Login', () => {
   });
 
   it('should navigate to dashboard after successful login', async () => {
+    const loginSubject = new Subject<LoginResponse>();
     const response: LoginResponse = {
       userEmail: 'admin@enterprise.com',
       userId: 'admin-1',
       roles: ['super_admin'],
       accessTokenExpiresInSeconds: 900,
     };
-    loginMock.mockReturnValue(of(response));
+    loginMock.mockReturnValue(loginSubject.asObservable());
 
     component.loginForm.setValue({
       email: 'admin@enterprise.com',
@@ -54,15 +55,19 @@ describe('Login', () => {
     });
 
     component.onSubmit();
-    expect(component.loginState).toBe('success');
-    expect(component.feedbackMessage).toBe('Login successful.');
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
+    expect(component.loginState).toBe('loading');
     expect(navigateSpy).not.toHaveBeenCalled();
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    loginSubject.next(response);
+    loginSubject.complete();
+    await fixture.whenStable();
+
     expect(navigateSpy).toHaveBeenCalledWith(['/dashboard']);
   });
 
-  it('should show error state for incorrect credentials', () => {
+  it('should show error state for incorrect credentials', async () => {
     loginMock.mockReturnValue(throwError(() => new Error('Incorrect email or password.')));
 
     component.loginForm.setValue({
@@ -71,19 +76,18 @@ describe('Login', () => {
     });
 
     component.onSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 5));
 
     expect(component.loginState).toBe('error');
     expect(component.errorMessage).toBe('Incorrect email or password.');
-    expect(component.feedbackMessage).toBe('Incorrect email or password.');
+    expect(component.loginForm.disabled).toBe(false);
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
-  it('should show loading state while request is processing', () => {
+  it('should show loading state while request is processing', async () => {
+    const pendingLogin = new Subject<LoginResponse>();
     loginMock.mockReturnValue(
-      new Observable<LoginResponse>((subscriber) => {
-        // keep request open to assert immediate loading state
-        void subscriber;
-      }),
+      pendingLogin.asObservable(),
     );
 
     component.loginForm.setValue({
@@ -92,8 +96,12 @@ describe('Login', () => {
     });
 
     component.onSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 5));
 
     expect(component.loginState).toBe('loading');
-    expect(component.isSubmitting).toBe(true);
+    expect(component.loginForm.disabled).toBe(true);
+
+    pendingLogin.complete();
+    await fixture.whenStable();
   });
 });
