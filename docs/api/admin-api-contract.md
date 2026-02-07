@@ -43,6 +43,13 @@ Resulting base path:
 - Admin category set default: `POST /api/v1/admin/categories/{id}/set-default`
 - Admin category delete: `DELETE /api/v1/admin/categories/{id}`
 - Admin category settings update: `PATCH /api/v1/admin/categories/settings`
+- Admin system snapshot: `GET /api/v1/admin/system`
+- Admin provider usage history: `GET /api/v1/admin/system/provider-usage`
+- Admin run backup: `POST /api/v1/admin/system/backup/run`
+- Admin backup status: `GET /api/v1/admin/system/backup/{id}`
+- Admin cancel backup: `POST /api/v1/admin/system/backup/{id}/cancel`
+- Admin delete requests list: `GET /api/v1/admin/system/delete-requests`
+- Admin delete request decision: `POST /api/v1/admin/system/delete-requests/{id}/decision`
 
 ## Detailed Endpoint Docs
 
@@ -56,6 +63,8 @@ Resulting base path:
   - `docs/api/currencies-api.md`
 - Admin categories endpoints:
   - `docs/api/categories-api.md`
+- Admin system monitoring endpoints:
+  - `docs/api/system-api.md`
 
 ## Naming Conventions
 

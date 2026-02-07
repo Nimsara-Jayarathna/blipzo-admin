@@ -70,7 +70,7 @@ export class Dashboard {
     }
 
     if (url.includes('/dashboard/system')) {
-      this.pageTitle = 'System';
+      this.pageTitle = 'System Monitoring';
       this.pageChip = '/admin/system';
       return;
     }
