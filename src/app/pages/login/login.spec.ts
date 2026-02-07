@@ -11,17 +11,13 @@ describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
   let navigateSpy: ReturnType<typeof vi.spyOn>;
-  const checkSessionMock = vi.fn(() => of(false));
   const loginMock = vi.fn();
   const authServiceMock = {
-    checkSession: checkSessionMock,
     login: loginMock,
-  } as Pick<AuthService, 'checkSession' | 'login'>;
+  } as Pick<AuthService, 'login'>;
 
   beforeEach(async () => {
-    checkSessionMock.mockReset();
     loginMock.mockReset();
-    checkSessionMock.mockReturnValue(of(false));
 
     await TestBed.configureTestingModule({
       imports: [Login],
