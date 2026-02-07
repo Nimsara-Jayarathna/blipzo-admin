@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { adminApiUrl } from '../api/api-endpoints';
+import { HTTP_REQUEST_LOADING_MESSAGE } from '../http/http-request-feedback.context';
 import { DashboardService } from './dashboard.service';
 
 describe('DashboardService', () => {
@@ -37,6 +38,7 @@ describe('DashboardService', () => {
     );
     expect(request.request.method).toBe('GET');
     expect(request.request.withCredentials).toBe(true);
+    expect(request.request.context.get(HTTP_REQUEST_LOADING_MESSAGE)).toBe('Loading dashboard...');
     request.flush({
       success: true,
       message: 'Dashboard snapshot loaded.',

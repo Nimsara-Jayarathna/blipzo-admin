@@ -1,7 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { adminApiUrl } from '../api/api-endpoints';
+import { HTTP_REQUEST_LOADING_MESSAGE } from '../http/http-request-feedback.context';
 import {
   ApiSuccessResponse,
   DashboardSnapshot,
@@ -29,6 +30,7 @@ export class DashboardService {
       .get<ApiSuccessResponse<DashboardSnapshot>>(DASHBOARD_SNAPSHOT_URL, {
         params,
         withCredentials: true,
+        context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Loading dashboard...'),
       })
       .pipe(map((response) => response.data));
   }

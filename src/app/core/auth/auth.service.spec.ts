@@ -3,6 +3,12 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { adminApiUrl } from '../api/api-endpoints';
+import {
+  HTTP_REQUEST_LOADING_MESSAGE,
+  HTTP_REQUEST_SUCCESS_MESSAGE,
+  SHOW_HTTP_REQUEST_SUCCESS,
+  SKIP_HTTP_REQUEST_FEEDBACK,
+} from '../http/http-request-feedback.context';
 import { AuthService } from './auth.service';
 import { ApiSuccessResponse, AdminLoginApiData } from './models/auth.models';
 
@@ -30,6 +36,7 @@ describe('AuthService', () => {
     const request = httpMock.expectOne(adminApiUrl('auth/login'));
     expect(request.request.method).toBe('POST');
     expect(request.request.withCredentials).toBe(true);
+    expect(request.request.context.get(HTTP_REQUEST_LOADING_MESSAGE)).toBe('Signing in...');
     request.flush(buildLoginSuccessResponse());
 
     const result = await loginPromise;
@@ -43,6 +50,9 @@ describe('AuthService', () => {
     const request = httpMock.expectOne(adminApiUrl('auth/logout'));
     expect(request.request.method).toBe('POST');
     expect(request.request.withCredentials).toBe(true);
+    expect(request.request.context.get(HTTP_REQUEST_LOADING_MESSAGE)).toBe('Signing out...');
+    expect(request.request.context.get(SHOW_HTTP_REQUEST_SUCCESS)).toBe(true);
+    expect(request.request.context.get(HTTP_REQUEST_SUCCESS_MESSAGE)).toBe('Signed out successfully.');
     request.flush({});
     await logoutPromise;
   });
@@ -52,6 +62,7 @@ describe('AuthService', () => {
     const request = httpMock.expectOne(adminApiUrl('auth/session'));
     expect(request.request.method).toBe('GET');
     expect(request.request.withCredentials).toBe(true);
+    expect(request.request.context.get(SKIP_HTTP_REQUEST_FEEDBACK)).toBe(true);
     request.flush({
       success: true,
       message: 'Session active.',
