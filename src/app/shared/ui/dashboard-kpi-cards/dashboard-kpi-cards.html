@@ -1,40 +1,40 @@
-<section class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-  <article class="min-h-28 rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] px-5 py-4">
-    <p class="mb-3 mt-0 text-[0.95rem] text-[#9aaac2]">Total Users</p>
-    <div class="flex items-baseline justify-between gap-3">
-      <strong class="text-4xl font-bold leading-none text-[#f4f8ff]">{{ summary().totalUsers.value }}</strong>
-      <span
-        class="rounded-md bg-[rgba(16,185,129,0.16)] px-2 py-1 text-[0.72rem] font-bold text-[#10b981]"
-      >+{{ summary().totalUsers.deltaPct }}%</span>
+<section class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+  <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
+    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Total Users</p>
+    <div class="flex items-end justify-between gap-3">
+      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().totalUsers.value) }}</strong>
+      <span class="rounded-md bg-[rgba(16,185,129,0.16)] px-2.5 py-1 text-[0.85rem] font-bold text-[#10d39f]">
+        {{ deltaText(summary().totalUsers.deltaPct) }}%
+      </span>
     </div>
   </article>
 
-  <article class="min-h-28 rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] px-5 py-4">
-    <p class="mb-3 mt-0 text-[0.95rem] text-[#9aaac2]">Active Users</p>
-    <div class="flex items-baseline justify-between gap-3">
-      <strong class="text-4xl font-bold leading-none text-[#f4f8ff]">{{ summary().activeUsers.value }}</strong>
-      <span
-        class="rounded-md bg-[rgba(16,185,129,0.16)] px-2 py-1 text-[0.72rem] font-bold text-[#10b981]"
-      >+{{ summary().activeUsers.deltaPct }}%</span>
+  <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
+    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Active Users</p>
+    <div class="flex items-end justify-between gap-3">
+      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().activeUsers.value) }}</strong>
+      <span class="rounded-md bg-[rgba(16,185,129,0.16)] px-2.5 py-1 text-[0.85rem] font-bold text-[#10d39f]">
+        {{ deltaText(summary().activeUsers.deltaPct) }}%
+      </span>
     </div>
   </article>
 
-  <article class="min-h-28 rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] px-5 py-4">
-    <p class="mb-3 mt-0 text-[0.95rem] text-[#9aaac2]">Default Currency</p>
-    <div class="flex items-baseline justify-between gap-3">
-      <strong class="text-4xl font-bold leading-none text-[#f4f8ff]">{{ summary().defaultCurrency.value }}</strong>
-      <span
-        class="rounded-md bg-[rgba(148,163,184,0.16)] px-2 py-1 text-[0.72rem] font-bold text-[#b2bed0]"
-      >{{ summary().defaultCurrency.deltaPct }}%</span>
+  <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
+    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Default Currency</p>
+    <div class="flex items-end justify-between gap-3">
+      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ summary().defaultCurrency.value }}</strong>
+      <span class="rounded-md bg-[#1f2b3a] px-2.5 py-1 text-[0.85rem] font-bold text-[#a3afc2]">
+        {{ summary().defaultCurrency.deltaPct }}%
+      </span>
     </div>
   </article>
 
-  <article class="min-h-28 rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] px-5 py-4">
-    <p class="mb-3 mt-0 text-[0.95rem] text-[#9aaac2]">Error Count</p>
-    <div class="flex items-baseline justify-between gap-3">
-      <strong class="text-4xl font-bold leading-none text-[#f4f8ff]">{{ summary().errorCount.value }}</strong>
+  <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] px-7 py-7 shadow-[inset_0_0_0_1px_rgba(16,24,39,0.05)]">
+    <p class="mb-3 mt-0 text-[1.05rem] font-medium text-[#9aabc2]">Error Count</p>
+    <div class="flex items-end justify-between gap-3">
+      <strong class="text-[3.25rem] font-bold leading-none tracking-tight text-[#f4f8ff]">{{ formatValue(summary().errorCount.value) }}</strong>
       <span [class]="errorDeltaClass()">
-        {{ summary().errorCount.deltaPct }}%
+        {{ deltaText(summary().errorCount.deltaPct) }}%
       </span>
     </div>
   </article>

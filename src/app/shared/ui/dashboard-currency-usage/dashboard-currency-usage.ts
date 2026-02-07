@@ -24,9 +24,20 @@ export class DashboardCurrencyUsageComponent {
 
   periodButtonClass(period: DashboardPeriod): string {
     const base =
-      'rounded-md border border-[#3a4c68] bg-transparent px-3 py-2 text-[0.82rem] font-semibold text-[#95a3ba] disabled:cursor-not-allowed disabled:opacity-50';
+      'rounded-lg border border-[#334459] bg-[#111b29] px-4 py-2 text-[1.15rem] font-semibold text-[#92a3bd] disabled:cursor-not-allowed disabled:opacity-50';
     return this.selectedPeriod() === period
-      ? `${base} border-[#4c8ee2] bg-[#1c2c46] text-[#e3ecfb]`
+      ? `${base} border-[#5a6f89] bg-[#0f1723] text-[#e9f2ff]`
       : base;
+  }
+
+  segmentBarClass(index: number): string {
+    const base = 'h-[0.72rem] w-[4.6rem] rounded-full';
+    if (index === 0) {
+      return `${base} bg-[#2994ff]`;
+    }
+    if (index === 1) {
+      return `${base} bg-[#1f6fbf]`;
+    }
+    return `${base} bg-[#3c4f66]`;
   }
 }

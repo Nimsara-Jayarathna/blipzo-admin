@@ -1,45 +1,35 @@
-<section class="min-h-[28rem] rounded-2xl border border-[#32425a] bg-gradient-to-b from-[#0f1828] to-[#0d1725] p-4">
-  <header class="mb-4 flex flex-wrap items-center justify-between gap-3">
-    <h3 class="m-0 text-2xl text-[#f4f8ff] sm:text-[2rem]">Currency Usage Distribution</h3>
-    <div class="flex gap-2">
-      <button
-        type="button"
-        [class]="periodButtonClass('30d')"
-        [disabled]="isLoading()"
-        (click)="onPeriodSelect('30d')"
-      >
+<section class="flex min-h-[44rem] flex-col gap-4">
+  <header class="flex items-center justify-between gap-4">
+    <h3 class="m-0 text-[2.9rem] font-bold tracking-tight text-[#f5f8fe]">Currency Usage Distribution</h3>
+    <div class="flex gap-3">
+      <button type="button" [class]="periodButtonClass('30d')" [disabled]="isLoading()" (click)="onPeriodSelect('30d')">
         30 Days
       </button>
-      <button
-        type="button"
-        [class]="periodButtonClass('90d')"
-        [disabled]="isLoading()"
-        (click)="onPeriodSelect('90d')"
-      >
+      <button type="button" [class]="periodButtonClass('90d')" [disabled]="isLoading()" (click)="onPeriodSelect('90d')">
         90 Days
       </button>
     </div>
   </header>
 
-  <div class="grid min-h-[24.8rem] place-items-center gap-11 rounded-2xl border border-[#32425a] px-4 py-9">
+  <div class="flex min-h-[35rem] flex-1 flex-col items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] px-6 py-10">
     <div
-      class="relative h-[8.4rem] w-[8.4rem] rounded-full border-[0.55rem] border-[#293850] before:absolute before:inset-[-0.55rem] before:rounded-full before:border-[0.55rem] before:border-transparent before:border-r-[rgba(33,150,243,0.55)] before:border-t-[#2196f3] before:content-['']"
+      class="relative h-[10.6rem] w-[10.6rem] rounded-full border-[0.7rem] border-[#2f3e54] before:absolute before:inset-[-0.7rem] before:rounded-full before:border-[0.7rem] before:border-transparent before:border-r-[#1f6fbf] before:border-t-[#2994ff] before:content-['']"
     >
       <div class="absolute inset-0 grid place-content-center text-center">
-        <span class="text-[0.8rem] font-semibold text-[#8ea0bb]">Total</span>
-        <strong class="text-4xl font-bold text-[#f8fbff] sm:text-[2.75rem]">${{ usage().totalAmount.toLocaleString() }}</strong>
+        <span class="text-[1.35rem] font-semibold text-[#8da0ba]">Total</span>
+        <strong class="text-[3.1rem] font-bold leading-none text-[#f8fbff]">${{ usage().totalAmount.toLocaleString() }}</strong>
       </div>
     </div>
 
-    <div class="flex flex-wrap justify-center gap-x-12 gap-y-4">
-      @for (segment of usage().segments; track segment.code) {
-        <div class="grid gap-2">
-          <div class="h-[0.55rem] w-[3.2rem] rounded-full bg-[#2196f3]"></div>
-          <span class="text-[0.85rem] font-semibold text-[#8ea0bb]">{{ segment.code }} ({{ segment.percent }}%)</span>
+    <div class="mt-12 flex flex-wrap justify-center gap-x-14 gap-y-5">
+      @for (segment of usage().segments; track segment.code; let i = $index) {
+        <div class="flex flex-col items-center gap-2.5">
+          <div [class]="segmentBarClass(i)"></div>
+          <span class="text-[1.02rem] font-semibold uppercase text-[#91a3bc]">{{ segment.code }} ({{ segment.percent }}%)</span>
         </div>
       }
     </div>
 
-    <p class="m-0 text-[0.95rem] italic text-[#8495ad]">[ Chart Visualization Placeholder ]</p>
+    <p class="mt-12 text-[1.5rem] italic text-[#7f8da1]">[ Chart Visualization Placeholder ]</p>
   </div>
 </section>

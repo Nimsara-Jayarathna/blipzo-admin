@@ -14,7 +14,7 @@ export class DashboardRecentEventsComponent {
   }
 
   levelChipClass(level: string): string {
-    const base = 'inline-flex rounded-md px-2 py-1 text-[0.7rem] font-bold uppercase';
+    const base = 'inline-flex rounded-md px-2.5 py-1 text-[0.95rem] font-bold uppercase';
     switch (this.levelClass(level)) {
       case 'error':
         return `${base} bg-[rgba(244,63,94,0.14)] text-[#f43f5e]`;
