@@ -5,5 +5,5 @@ export const environment = {
   apiVersion: 'v1',
   apiPrefix: 'api',
   adminApiSegment: 'admin',
-  adminUsersPageSize: 2,
+  adminUsersPageSize: 10,
 };

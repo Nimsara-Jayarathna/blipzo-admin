@@ -27,7 +27,10 @@ Resulting base path:
 - Admin dashboard snapshot: `GET /api/v1/admin/dashboard`
 - Admin users list: `GET /api/v1/admin/users`
 - Admin user detail: `GET /api/v1/admin/users/{id}`
-- Admin system settings: `GET /api/v1/admin/system/settings`
+- Admin user update: `PATCH /api/v1/admin/users/{id}`
+- Admin user activity: `GET /api/v1/admin/users/{id}/activity`
+- Admin user reset password: `POST /api/v1/admin/users/{id}/reset-password`
+- Admin user force logout: `POST /api/v1/admin/users/{id}/force-logout`
 
 ## Detailed Endpoint Docs
 

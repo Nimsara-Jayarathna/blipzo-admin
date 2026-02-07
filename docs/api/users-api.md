@@ -1,154 +1,168 @@
 # Users API Contract
 
-This document defines the dedicated API and frontend integration contract for the Admin Users section.
+This document defines the API + frontend contract for Admin Users.
 
 ## Naming Conventions
 
-- Endpoint path uses plural resource naming
-  - `GET /api/v1/admin/users`
-- Query params are lowercase/camelCase
-  - `name`, `email`, `userId`, `status`, `page`, `limit`
-- User object keys are camelCase and stable
-  - `id`, `name`, `email`, `status`
-- Status values are uppercase enums
-  - `ACTIVE`, `INACTIVE`, `SUSPENDED`
-- Paging config variable in frontend uses descriptive camelCase
-  - `adminUsersPageSize`
+- Resource paths are plural nouns: `/users`
+- Action paths are verb-noun: `/reset-password`, `/force-logout`
+- JSON fields use camelCase: `categoryLimit`, `lastLoginAt`
+- Status enums are uppercase: `ACTIVE`, `INACTIVE`, `SUSPENDED`
 
-## Endpoint
+## Endpoints
 
-`GET /api/v1/admin/users`
+- `GET /api/v1.1/admin/users`
+- `GET /api/v1.1/admin/users/{id}`
+- `PATCH /api/v1.1/admin/users/{id}`
+- `GET /api/v1.1/admin/users/{id}/activity`
+- `POST /api/v1.1/admin/users/{id}/reset-password`
+- `POST /api/v1.1/admin/users/{id}/force-logout`
 
-## Purpose
+## Frontend Fetch Strategy
 
-Load users for the Admin Users page (filters + table + pagination view).
+Users table uses a single list call, then applies filters + pagination client-side.
 
-## Frontend Fetch Strategy (Current)
+## Configurable Pagination Size
 
-Frontend performs a **single API call** and applies filters + pagination on the client.
+Set `adminUsersPageSize` in:
 
-- Fetch all users once on page load.
-- Store full list in memory.
-- Apply filter criteria client-side.
-- Slice filtered result for current page.
+- `src/environments/environment.ts`
+- `src/environments/environment.development.ts`
 
-This is intentional for fast UX at current admin scale.
+Default is `10`.
 
-## Configurable Page Size
+## Users List
 
-Use a single variable in frontend code:
+### Endpoint
 
-- `pageSize = 10` (recommended default)
+`GET /api/v1.1/admin/users`
 
-Why 10:
+### Query Parameters
 
-- Good density/readability for admin tables.
-- Stable row height across laptop screens.
-- Easy to scan with minimal scrolling.
+- `name` (string, optional)
+- `email` (string, optional)
+- `userId` (string, optional)
+- `status` (`ACTIVE | INACTIVE | SUSPENDED`, optional)
 
-Pagination visibility rule:
-
-- Show pagination controls only when `filteredCount > pageSize`.
-- If `filteredCount <= pageSize`, render rows without pager controls.
-
-## Query Parameters
-
-Current implementation can work with no query params:
-
-`GET /api/v1/admin/users`
-
-Optional future query parameters (server-side mode ready):
-
-- `name` (string)
-- `email` (string)
-- `userId` (string)
-- `status` (`ACTIVE | INACTIVE | SUSPENDED`)
-- `page` (number)
-- `limit` (number)
-
-## Success Response Envelope
+### Success `data`
 
 ```json
 {
-  "success": true,
-  "message": "Users loaded.",
-  "data": {
-    "users": [
-      {
-        "id": "1001",
-        "name": "Johnathan Doe",
-        "email": "j.doe@example.com",
-        "status": "ACTIVE"
-      },
-      {
-        "id": "1002",
-        "name": "Jane Smith",
-        "email": "jane.smith@blipzo.io",
-        "status": "ACTIVE"
-      }
-    ],
-    "total": 1240
-  },
-  "meta": {
-    "requestId": "req-users-001",
-    "timestamp": "2026-02-07T12:00:00.000Z"
-  }
+  "users": [
+    {
+      "id": "65f0...",
+      "name": "Jane Smith",
+      "email": "jane.smith@blipzo.io",
+      "status": "ACTIVE"
+    }
+  ],
+  "total": 1
 }
 ```
 
-## Field Contract
+## User Profile
 
-### User object
+### Endpoint
 
-- `id`: string (displayed as `#id`)
-- `name`: string
-- `email`: string
-- `status`: `ACTIVE | INACTIVE | SUSPENDED`
+`GET /api/v1.1/admin/users/{id}`
 
-### Data object
-
-- `users`: array of user objects
-- `total`: total user count for dataset
-
-## Error Response Envelope
+### Success `data`
 
 ```json
 {
-  "success": false,
-  "message": "Unable to load users.",
-  "meta": {
-    "requestId": "req-users-500",
-    "timestamp": "2026-02-07T12:00:02.000Z"
-  }
+  "id": "65f0...",
+  "name": "Jane Smith",
+  "email": "jane.smith@blipzo.io",
+  "status": "ACTIVE",
+  "categoryLimit": 10,
+  "defaultCurrency": "USD ($)",
+  "createdAt": "2023-10-12T00:00:00.000Z",
+  "lastLoginAt": "2026-02-07T09:20:00.000Z",
+  "role": "CONSUMER"
 }
 ```
 
-## Frontend Mapping
+## Update User
 
-- Filter form uses fields: `name`, `email`, `userId`, `status`.
-- Table uses: `id`, `name`, `email`, `status`.
-- Footer count text uses:
-  - `Showing {start}-{end} of {filteredCount} users`
-- Pager uses `pageSize` variable and current page index.
+### Endpoint
 
-## Status Presentation Rules
+`PATCH /api/v1.1/admin/users/{id}`
 
-- `status` display:
-  - `ACTIVE`: green dot + green label
-  - `INACTIVE`: slate dot + slate label
-  - `SUSPENDED`: rose dot + rose label
+### Request Body
 
-## Backend Notes
+```json
+{
+  "email": "jane.updated@blipzo.io",
+  "status": "ACTIVE",
+  "categoryLimit": 25
+}
+```
 
-- Keep response envelope consistent with admin standard.
-- Include `total` even when returning full list.
-- Return `200` with an empty `users` array when no matches.
-- Preserve enum casing (`ACTIVE`, `INACTIVE`, `SUSPENDED`).
+### Validation
 
-## Future Migration Path (Optional)
+- `status` must be `ACTIVE | INACTIVE | SUSPENDED`
+- `categoryLimit` must be integer `0..1000`
+- `email` must be unique across users
 
-If dataset grows, frontend can migrate to server-side paging without breaking UI contract by enabling query params:
+## User Activity
 
-- `GET /admin/users?page=1&limit=10&name=...`
+### Endpoint
 
-UI components remain reusable; only data source strategy changes.
+`GET /api/v1.1/admin/users/{id}/activity`
+
+### Success `data`
+
+```json
+{
+  "activity": [
+    {
+      "event": "Login",
+      "details": "Last successful login",
+      "date": "2026-02-07T09:20:00.000Z"
+    }
+  ]
+}
+```
+
+## Reset Password
+
+### Endpoint
+
+`POST /api/v1.1/admin/users/{id}/reset-password`
+
+### Behavior
+
+- Generate random temporary password
+- Hash + store in `User.password`
+- Set `mustChangePassword = true`
+- Increment `tokenVersion` (invalidates active tokens)
+- Send password email to user
+
+### Success `data`
+
+```json
+{
+  "userId": "65f0...",
+  "email": "jane.smith@blipzo.io"
+}
+```
+
+## Force Logout
+
+### Endpoint
+
+`POST /api/v1.1/admin/users/{id}/force-logout`
+
+### Behavior
+
+- Increment `tokenVersion` to invalidate active access/refresh tokens.
+- Works without dedicated session table.
+
+### Success `data`
+
+```json
+{
+  "userId": "65f0...",
+  "tokenVersion": 4
+}
+```
