@@ -1,1 +1,15 @@
-<p>dashboard works!</p>
+<div class="dashboard-layout">
+  <aside class="dashboard-sidebar">
+    <h2 class="dashboard-title">Blipzo Admin</h2>
+    <nav class="dashboard-nav">
+      <a routerLink="users" routerLinkActive="active-link">Users</a>
+      <a routerLink="currencies" routerLinkActive="active-link">Currencies</a>
+      <a routerLink="categories" routerLinkActive="active-link">Categories</a>
+      <a routerLink="system" routerLinkActive="active-link">System</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
