@@ -31,6 +31,12 @@ Resulting base path:
 - Admin user activity: `GET /api/v1/admin/users/{id}/activity`
 - Admin user reset password: `POST /api/v1/admin/users/{id}/reset-password`
 - Admin user force logout: `POST /api/v1/admin/users/{id}/force-logout`
+- Admin currencies list: `GET /api/v1/admin/currencies`
+- Admin currency detail: `GET /api/v1/admin/currencies/{id}`
+- Admin currency create: `POST /api/v1/admin/currencies`
+- Admin currency update: `PATCH /api/v1/admin/currencies/{id}`
+- Admin currency set default: `POST /api/v1/admin/currencies/{id}/set-default`
+- Admin currency toggle status: `POST /api/v1/admin/currencies/{id}/toggle-status`
 
 ## Detailed Endpoint Docs
 
@@ -40,6 +46,8 @@ Resulting base path:
   - `docs/api/admin-dashboard-api.md`
 - Admin users endpoint:
   - `docs/api/users-api.md`
+- Admin currencies endpoints:
+  - `docs/api/currencies-api.md`
 
 ## Naming Conventions
 

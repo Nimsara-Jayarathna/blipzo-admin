@@ -58,7 +58,7 @@ export class Dashboard {
     }
 
     if (url.includes('/dashboard/currencies')) {
-      this.pageTitle = 'Currencies';
+      this.pageTitle = 'Currency Management';
       this.pageChip = '/admin/currencies';
       return;
     }
