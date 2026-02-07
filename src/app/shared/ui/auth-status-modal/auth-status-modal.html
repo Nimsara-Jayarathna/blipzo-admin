@@ -1,0 +1,23 @@
+@if (state() !== 'hidden') {
+  <div class="status-overlay" role="status" aria-live="polite">
+    <div class="status-card">
+      @if (state() === 'loading') {
+        <div class="status-icon spinner-wrap">
+          <span class="spinner"></span>
+        </div>
+        <h2>Signing In</h2>
+        <p>Please wait while we verify your credentials.</p>
+      } @else {
+        <div class="status-icon success-wrap">✓</div>
+        <h2>Login Successful</h2>
+        <p>Redirecting to dashboard...</p>
+        <div class="status-dots" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="status-footer">Authenticated session initialized</div>
+      }
+    </div>
+  </div>
+}

@@ -1,1 +1,22 @@
-<p>login works!</p>
+<section class="login-page">
+  <div class="login-overlay"></div>
+
+  <main class="login-shell">
+    <div class="login-card">
+      <header class="login-header">
+        <div class="login-icon" aria-hidden="true">🔒</div>
+        <h1>Admin Login</h1>
+      </header>
+
+      <app-login-form
+        [form]="loginForm"
+        [errorMessage]="errorMessage"
+        (submitForm)="onSubmit()"
+      ></app-login-form>
+    </div>
+  </main>
+
+  @if (loginState === 'loading') {
+    <app-auth-status-modal state="loading"></app-auth-status-modal>
+  }
+</section>

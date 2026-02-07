@@ -54,6 +54,41 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Admin API Configuration
+
+The admin frontend builds API URLs from environment variables in:
+
+- `src/environments/environment.ts`
+- `src/environments/environment.development.ts`
+
+Fields:
+
+- `apiBaseUrl`
+- `apiPrefix`
+- `apiVersion`
+- `adminApiSegment`
+
+Route format:
+
+`{apiBaseUrl}/{apiPrefix}/{apiVersion}/{adminApiSegment}/{path}`
+
+Example:
+
+`https://api.example.com/api/v1/admin/auth/login`
+
+### Authentication mode
+
+- Cookie-based auth (`HttpOnly` + `Secure`) is used.
+- Frontend does not use `localStorage` for tokens.
+- Admin API requests are sent with `withCredentials: true`.
+- Backend should enforce `15 minute` access-token lifetime.
+
+## API Contract Documentation
+
+Admin API contract (routes, request/response envelopes, login schema) is documented in:
+
+- `docs/api/admin-api-contract.md`
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
