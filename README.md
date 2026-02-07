@@ -89,6 +89,34 @@ Admin API contract (routes, request/response envelopes, login schema) is documen
 
 - `docs/api/admin-api-contract.md`
 
+## Naming Conventions
+
+Use these conventions for quick readability and consistency.
+
+- Folders and files: `kebab-case`
+  - Example: `src/app/shared/ui/global-request-feedback-modal`
+- Angular components:
+  - File names: `feature-name.ts`, `feature-name.html`
+  - Class names: `PascalCase`
+  - Example: `dashboard-recent-events.ts` -> `DashboardRecentEventsComponent`
+- Services:
+  - File names end with `.service.ts`
+  - Class names end with `Service`
+  - Example: `users.service.ts` -> `UsersService`
+- Guards/interceptors:
+  - File names include role/scope clearly
+  - Example: `auth.guard.ts`, `http-request-feedback.interceptor.ts`
+- Models/types:
+  - File names end with `.models.ts`
+  - Interfaces/types in `PascalCase`
+  - Example: `users.models.ts` -> `AdminUser`, `UserStatus`
+- Environment keys:
+  - `camelCase`
+  - Example: `adminUsersPageSize`, `apiBaseUrl`
+- API docs:
+  - One overview + focused docs per endpoint group
+  - Example: `admin-api-contract.md` + `admin-auth-api.md` + `admin-dashboard-api.md` + `users-api.md`
+
 ### Dashboard API (aggregate endpoint)
 
 Dashboard first-load data is fetched from one endpoint with params:
