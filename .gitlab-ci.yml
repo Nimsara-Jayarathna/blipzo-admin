@@ -18,10 +18,10 @@ build_stg:
   variables:
     DOCKER_TLS_CERTDIR: ""
     BUILD_CONFIGURATION: production
-    ADMIN_API_BASE_URL: $ADMIN_API_BASE_URL_STG
   script:
+    - test -n "$ADMIN_API_BASE_URL_STG" || (echo "Missing ADMIN_API_BASE_URL_STG" && exit 1)
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker build --build-arg BUILD_CONFIGURATION --build-arg ADMIN_API_BASE_URL -t "$CI_REGISTRY_IMAGE:stg" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - docker build --build-arg BUILD_CONFIGURATION --build-arg ADMIN_API_BASE_URL="$ADMIN_API_BASE_URL_STG" -t "$CI_REGISTRY_IMAGE:stg" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
     - docker push "$CI_REGISTRY_IMAGE:stg"
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
   rules:
@@ -38,10 +38,10 @@ build_prod:
   variables:
     DOCKER_TLS_CERTDIR: ""
     BUILD_CONFIGURATION: production
-    ADMIN_API_BASE_URL: $ADMIN_API_BASE_URL_PROD
   script:
+    - test -n "$ADMIN_API_BASE_URL_PROD" || (echo "Missing ADMIN_API_BASE_URL_PROD" && exit 1)
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker build --build-arg BUILD_CONFIGURATION --build-arg ADMIN_API_BASE_URL -t "$CI_REGISTRY_IMAGE:prod" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - docker build --build-arg BUILD_CONFIGURATION --build-arg ADMIN_API_BASE_URL="$ADMIN_API_BASE_URL_PROD" -t "$CI_REGISTRY_IMAGE:prod" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
     - docker push "$CI_REGISTRY_IMAGE:prod"
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
   rules:
