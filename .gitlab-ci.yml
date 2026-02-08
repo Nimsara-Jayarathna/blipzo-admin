@@ -86,13 +86,13 @@ build_prod:
         ADMIN_API_SEGMENT="${ADMIN_API_SEGMENT:-admin}"
 
         cat > "$SERVE_DIR/runtime-config.js" <<CFG
-window.__BLIPZO_CONFIG__ = {
-  apiBaseUrl: "${ADMIN_API_BASE_URL}",
-  apiPrefix: "${ADMIN_API_PREFIX}",
-  apiVersion: "${ADMIN_API_VERSION}",
-  adminApiSegment: "${ADMIN_API_SEGMENT}"
-};
-CFG
+        window.__BLIPZO_CONFIG__ = {
+          apiBaseUrl: "${ADMIN_API_BASE_URL}",
+          apiPrefix: "${ADMIN_API_PREFIX}",
+          apiVersion: "${ADMIN_API_VERSION}",
+          adminApiSegment: "${ADMIN_API_SEGMENT}"
+        };
+        CFG
 
         if command -v fuser >/dev/null 2>&1; then
           fuser -k "${SERVE_PORT}/tcp" || true
