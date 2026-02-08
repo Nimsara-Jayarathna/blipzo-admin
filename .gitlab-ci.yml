@@ -78,8 +78,22 @@ build_prod:
           "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
     - |
         ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-          "SERVE_DIR='$SERVE_DIR' SERVE_PORT='$SERVE_PORT' bash -s" <<'EOF'
+          "SERVE_DIR='$SERVE_DIR' SERVE_PORT='$SERVE_PORT' ADMIN_API_BASE_URL='$ADMIN_API_BASE_URL' ADMIN_API_PREFIX='$ADMIN_API_PREFIX' ADMIN_API_VERSION='$ADMIN_API_VERSION' ADMIN_API_SEGMENT='$ADMIN_API_SEGMENT' bash -s" <<'EOF'
         set -euo pipefail
+        ADMIN_API_BASE_URL="${ADMIN_API_BASE_URL:-/api}"
+        ADMIN_API_PREFIX="${ADMIN_API_PREFIX:-api}"
+        ADMIN_API_VERSION="${ADMIN_API_VERSION:-v1.1}"
+        ADMIN_API_SEGMENT="${ADMIN_API_SEGMENT:-admin}"
+
+        cat > "$SERVE_DIR/runtime-config.js" <<CFG
+        window.__BLIPZO_CONFIG__ = {
+          apiBaseUrl: "${ADMIN_API_BASE_URL}",
+          apiPrefix: "${ADMIN_API_PREFIX}",
+          apiVersion: "${ADMIN_API_VERSION}",
+          adminApiSegment: "${ADMIN_API_SEGMENT}"
+        };
+        CFG
+
         if command -v fuser >/dev/null 2>&1; then
           fuser -k "${SERVE_PORT}/tcp" || true
         fi
@@ -98,6 +112,10 @@ deploy_stg:
     DEPLOY_PATH: /var/www/blipzo-admin-stg
     SERVE_DIR: /var/www/blipzo-admin-stg/browser
     SERVE_PORT: "4201"
+    ADMIN_API_BASE_URL: http://127.0.0.1:5001
+    ADMIN_API_PREFIX: api
+    ADMIN_API_VERSION: v1.1
+    ADMIN_API_SEGMENT: admin
 
 deploy_prod:
   extends: .deploy_template
@@ -110,3 +128,7 @@ deploy_prod:
     DEPLOY_PATH: /var/www/blipzo-admin-prod
     SERVE_DIR: /var/www/blipzo-admin-prod/browser
     SERVE_PORT: "4202"
+    ADMIN_API_BASE_URL: http://127.0.0.1:5000
+    ADMIN_API_PREFIX: api
+    ADMIN_API_VERSION: v1.1
+    ADMIN_API_SEGMENT: admin

@@ -1,4 +1,4 @@
-import { environment } from '../../../environments/environment';
+import { runtimeConfig } from '../config/runtime-config';
 
 function cleanSegment(segment: string): string {
   return segment.replace(/^\/+|\/+$/g, '');
@@ -11,19 +11,19 @@ function combineUrl(baseUrl: string, segments: string[]): string {
 }
 
 export function adminApiUrl(path: string): string {
-  return combineUrl(environment.apiBaseUrl, [
-    environment.apiPrefix,
-    environment.apiVersion,
-    environment.adminApiSegment,
+  return combineUrl(runtimeConfig.apiBaseUrl, [
+    runtimeConfig.apiPrefix,
+    runtimeConfig.apiVersion,
+    runtimeConfig.adminApiSegment,
     path,
   ]);
 }
 
 export function isAdminApiUrl(url: string): boolean {
-  const adminBase = combineUrl(environment.apiBaseUrl, [
-    environment.apiPrefix,
-    environment.apiVersion,
-    environment.adminApiSegment,
+  const adminBase = combineUrl(runtimeConfig.apiBaseUrl, [
+    runtimeConfig.apiPrefix,
+    runtimeConfig.apiVersion,
+    runtimeConfig.adminApiSegment,
   ]);
   return url.startsWith(adminBase);
 }
