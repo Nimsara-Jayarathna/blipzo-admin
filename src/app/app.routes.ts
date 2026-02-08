@@ -7,9 +7,11 @@ import { Currencies } from './pages/dashboard/currencies/currencies';
 import { System } from './pages/dashboard/system/system';
 import { Users } from './pages/dashboard/users/users';
 import { Login } from './pages/login/login';
+import { LoginVerify } from './pages/login-verify/login-verify';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
+  { path: 'login/verify', component: LoginVerify },
   {
     path: 'dashboard',
     component: Dashboard,

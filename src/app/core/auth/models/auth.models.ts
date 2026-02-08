@@ -10,6 +10,32 @@ export interface LoginResponse {
   accessTokenExpiresInSeconds: number;
 }
 
+export interface OtpChallengeStatus {
+  challengeId: string;
+  maskedEmail: string;
+  otpExpiresInSeconds: number;
+  remainingAttempts: number;
+  maxAttempts: number;
+  lockoutRemainingSeconds: number;
+  resendAvailableInSeconds: number;
+  status: 'pending' | 'locked' | 'expired' | 'consumed' | 'cancelled' | 'verified';
+}
+
+export interface OtpRequiredLoginResponse {
+  otpRequired: true;
+  challenge: OtpChallengeStatus;
+}
+
+export type LoginResult =
+  | {
+      kind: 'authenticated';
+      data: LoginResponse;
+    }
+  | {
+      kind: 'otp_required';
+      data: OtpRequiredLoginResponse;
+    };
+
 export interface ApiSuccessResponse<T> {
   success: true;
   message: string;
@@ -31,12 +57,21 @@ export interface ApiErrorResponse {
 }
 
 export interface AdminLoginApiData {
-  admin: {
+  otpRequired?: boolean;
+  challengeId?: string;
+  maskedEmail?: string;
+  otpExpiresInSeconds?: number;
+  remainingAttempts?: number;
+  maxAttempts?: number;
+  lockoutRemainingSeconds?: number;
+  resendAvailableInSeconds?: number;
+  status?: OtpChallengeStatus['status'];
+  admin?: {
     id: string;
     email: string;
     roles?: string[];
   };
-  session: {
+  session?: {
     accessTokenExpiresInSeconds: number;
   };
 }
@@ -51,4 +86,8 @@ export interface AdminSessionApiData {
   session?: {
     accessTokenExpiresInSeconds?: number;
   };
+}
+
+export interface VerifyOtpRequest {
+  otp: string;
 }
