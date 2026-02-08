@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   devBypassProtectedRoutes: true,
-  apiBaseUrl: 'http://localhost:5001',
+  apiBaseUrl: '',
   apiVersion: 'v1.1',
   apiPrefix: 'api',
   adminApiSegment: 'admin',

@@ -56,17 +56,23 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 ## Admin API Configuration
 
-The admin frontend builds API URLs from environment variables in:
+The admin frontend builds API URLs from runtime config first, with environment fallback.
 
-- `src/environments/environment.ts`
-- `src/environments/environment.development.ts`
+Runtime file:
 
-Fields:
+- `public/runtime-config.js` (copied to deploy output as `runtime-config.js`)
+
+Runtime keys:
 
 - `apiBaseUrl`
 - `apiPrefix`
 - `apiVersion`
 - `adminApiSegment`
+
+Fallback environment files:
+
+- `src/environments/environment.ts`
+- `src/environments/environment.development.ts`
 
 Route format:
 
@@ -74,7 +80,7 @@ Route format:
 
 Example:
 
-`https://api.example.com/api/v1/admin/auth/login`
+`/api/v1.1/admin/auth/login`
 
 ### Authentication mode
 
