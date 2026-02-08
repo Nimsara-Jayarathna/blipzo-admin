@@ -13,11 +13,18 @@ import {
   AdminLoginApiData,
   ApiErrorResponse,
   ApiSuccessResponse,
+  LoginResult,
   LoginRequest,
   LoginResponse,
+  OtpChallengeStatus,
+  VerifyOtpRequest,
 } from './models/auth.models';
 
 const LOGIN_URL = adminApiUrl('auth/login');
+const OTP_VERIFY_URL = adminApiUrl('auth/otp/verify');
+const OTP_RESEND_URL = adminApiUrl('auth/otp/resend');
+const OTP_STATUS_URL = adminApiUrl('auth/otp/status');
+const OTP_CANCEL_URL = adminApiUrl('auth/otp/cancel');
 const LOGOUT_URL = adminApiUrl('auth/logout');
 const SESSION_URL = adminApiUrl('auth/session');
 const AUTH_REQUEST_TIMEOUT_MS = 10000;
@@ -26,7 +33,7 @@ const AUTH_REQUEST_TIMEOUT_MS = 10000;
 export class AuthService {
   constructor(private readonly http: HttpClient) {}
 
-  login(payload: LoginRequest): Observable<LoginResponse> {
+  login(payload: LoginRequest): Observable<LoginResult> {
     const email = payload.email.trim().toLowerCase();
     if (!email || !payload.password) {
       return throwError(() => new Error('Email and password are required.'));
@@ -48,12 +55,79 @@ export class AuthService {
             throw new Error(response.message || 'Unable to sign in. Please try again.');
           }
 
-          return this.normalizeLoginResponse(response);
+          return this.normalizeLoginResult(response);
         }),
         catchError((error: unknown) =>
           throwError(() => new Error(this.extractErrorMessage(error))),
         ),
       );
+  }
+
+  verifyOtp(payload: VerifyOtpRequest): Observable<LoginResponse> {
+    const otp = payload.otp?.trim();
+    if (!otp) {
+      return throwError(() => new Error('OTP is required.'));
+    }
+
+    return this.http
+      .post<ApiSuccessResponse<AdminLoginApiData> | ApiErrorResponse>(
+        OTP_VERIFY_URL,
+        { otp },
+        {
+          withCredentials: true,
+          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Verifying code...'),
+        },
+      )
+      .pipe(
+        timeout(AUTH_REQUEST_TIMEOUT_MS),
+        map((response) => {
+          if (!response.success) {
+            throw new Error(response.message || 'Unable to verify code.');
+          }
+
+          return this.normalizeAuthenticatedResponse(response);
+        }),
+        catchError((error: unknown) =>
+          throwError(() => new Error(this.extractErrorMessage(error))),
+        ),
+      );
+  }
+
+  resendOtp(): Observable<OtpChallengeStatus> {
+    return this.http
+      .post<ApiSuccessResponse<AdminLoginApiData> | ApiErrorResponse>(
+        OTP_RESEND_URL,
+        {},
+        {
+          withCredentials: true,
+          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Resending code...'),
+        },
+      )
+      .pipe(
+        timeout(AUTH_REQUEST_TIMEOUT_MS),
+        map((response) => {
+          if (!response.success) {
+            throw new Error(response.message || 'Unable to resend verification code.');
+          }
+          return this.normalizeOtpChallenge(response.data);
+        }),
+      );
+  }
+
+  getOtpStatus(): Observable<OtpChallengeStatus> {
+    return this.http
+      .get<ApiSuccessResponse<AdminLoginApiData>>(OTP_STATUS_URL, {
+        withCredentials: true,
+        context: new HttpContext().set(SKIP_HTTP_REQUEST_FEEDBACK, true),
+      })
+      .pipe(
+        timeout(AUTH_REQUEST_TIMEOUT_MS),
+        map((response) => this.normalizeOtpChallenge(response.data)),
+      );
+  }
+
+  cancelOtpChallenge(): Observable<void> {
+    return this.http.post<void>(OTP_CANCEL_URL, {}, { withCredentials: true });
   }
 
   logout(): Observable<void> {
@@ -78,11 +152,61 @@ export class AuthService {
       );
   }
 
-  private normalizeLoginResponse(
+  private normalizeLoginResult(
+    response: ApiSuccessResponse<AdminLoginApiData>,
+  ): LoginResult {
+    const payload = response.data;
+    if (payload?.otpRequired) {
+      return {
+        kind: 'otp_required',
+        data: {
+          otpRequired: true,
+          challenge: this.normalizeOtpChallenge(payload),
+        },
+      };
+    }
+
+    return {
+      kind: 'authenticated',
+      data: this.normalizeAuthenticatedResponse(response),
+    };
+  }
+
+  private normalizeOtpChallenge(payload: Partial<AdminLoginApiData>): OtpChallengeStatus {
+    if (
+      !payload?.challengeId ||
+      !payload?.maskedEmail ||
+      payload.otpExpiresInSeconds == null ||
+      payload.remainingAttempts == null ||
+      payload.maxAttempts == null ||
+      payload.lockoutRemainingSeconds == null ||
+      payload.resendAvailableInSeconds == null ||
+      !payload.status
+    ) {
+      throw new Error('Invalid OTP challenge response from server.');
+    }
+
+    return {
+      challengeId: payload.challengeId,
+      maskedEmail: payload.maskedEmail,
+      otpExpiresInSeconds: payload.otpExpiresInSeconds,
+      remainingAttempts: payload.remainingAttempts,
+      maxAttempts: payload.maxAttempts,
+      lockoutRemainingSeconds: payload.lockoutRemainingSeconds,
+      resendAvailableInSeconds: payload.resendAvailableInSeconds,
+      status: payload.status,
+    };
+  }
+
+  private normalizeAuthenticatedResponse(
     response: ApiSuccessResponse<AdminLoginApiData>,
   ): LoginResponse {
     const payload = response.data;
-    if (!payload?.admin?.id || !payload?.admin?.email || !payload?.session) {
+    if (
+      !payload?.admin?.id ||
+      !payload?.admin?.email ||
+      !payload?.session?.accessTokenExpiresInSeconds
+    ) {
       throw new Error('Invalid login response from server.');
     }
 

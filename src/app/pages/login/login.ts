@@ -66,7 +66,16 @@ export class Login {
           }),
         )
         .subscribe({
-          next: () => {
+          next: (result) => {
+            if (result.kind === 'otp_required') {
+              void this.router.navigate(['/login/verify']).finally(() => {
+                if (this.loginState === 'loading') {
+                  this.updateState('idle');
+                }
+              });
+              return;
+            }
+
             void this.router.navigate(['/dashboard']).finally(() => {
               if (this.loginState === 'loading') {
                 this.updateState('idle');
