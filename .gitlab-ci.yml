@@ -7,35 +7,41 @@ workflow:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
     - when: never
 
-.build_template:
-  stage: build
-  image: node:20-alpine
-  cache:
-    key: ${CI_PROJECT_NAME}
-    paths:
-      - node_modules/
-  before_script:
-    - npm ci
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist/blipzo-admin/
-
 build_stg:
-  extends: .build_template
+  stage: build
+  image: docker:25
+  services:
+    - name: docker:25-dind
+      alias: docker
   environment:
     name: stg
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    BUILD_CONFIGURATION: production
   script:
-    - npm run build -- --configuration development
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build --build-arg BUILD_CONFIGURATION -t "$CI_REGISTRY_IMAGE:stg" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE:stg"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
 
 build_prod:
-  extends: .build_template
+  stage: build
+  image: docker:25
+  services:
+    - name: docker:25-dind
+      alias: docker
   environment:
     name: prod
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    BUILD_CONFIGURATION: production
   script:
-    - npm run build -- --configuration production
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build --build-arg BUILD_CONFIGURATION -t "$CI_REGISTRY_IMAGE:prod" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE:prod"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
@@ -67,38 +73,27 @@ build_prod:
   script:
     - |
         ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-          "DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'EOF'
+          "NPM_NET_NAME='${NPM_NET_NAME:-npm_default}' bash -s" <<'EOF'
         set -euo pipefail
-        mkdir -p "$DEPLOY_PATH"
+        if ! docker network inspect "$NPM_NET_NAME" >/dev/null 2>&1; then
+          docker network create --driver bridge "$NPM_NET_NAME"
+        fi
         EOF
     - |
-        rsync -az --delete \
-          -e "ssh $SSH_OPTS -p $SSH_PORT" \
-          dist/blipzo-admin/ \
-          "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+        ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "docker rm -f '$CONTAINER_NAME' >/dev/null 2>&1 || true"
+    - |
+        ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "echo '$CI_REGISTRY_PASSWORD' | docker login -u '$CI_REGISTRY_USER' --password-stdin '$CI_REGISTRY'"
+    - |
+        ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "docker pull '$IMAGE'"
     - |
         ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-          "SERVE_DIR='$SERVE_DIR' SERVE_PORT='$SERVE_PORT' ADMIN_API_BASE_URL='$ADMIN_API_BASE_URL' ADMIN_API_PREFIX='$ADMIN_API_PREFIX' ADMIN_API_VERSION='$ADMIN_API_VERSION' ADMIN_API_SEGMENT='$ADMIN_API_SEGMENT' bash -s" <<'EOF'
+          "NPM_NET_NAME='${NPM_NET_NAME:-npm_default}' CONTAINER_NAME='$CONTAINER_NAME' NETWORK_ALIAS='$NETWORK_ALIAS' IMAGE='$IMAGE' bash -s" <<'EOF'
         set -euo pipefail
-        ADMIN_API_BASE_URL="${ADMIN_API_BASE_URL:-/api}"
-        ADMIN_API_PREFIX="${ADMIN_API_PREFIX:-api}"
-        ADMIN_API_VERSION="${ADMIN_API_VERSION:-v1.1}"
-        ADMIN_API_SEGMENT="${ADMIN_API_SEGMENT:-admin}"
-
-        cat > "$SERVE_DIR/runtime-config.js" <<CFG
-        window.__BLIPZO_CONFIG__ = {
-          apiBaseUrl: "${ADMIN_API_BASE_URL}",
-          apiPrefix: "${ADMIN_API_PREFIX}",
-          apiVersion: "${ADMIN_API_VERSION}",
-          adminApiSegment: "${ADMIN_API_SEGMENT}"
-        };
-        CFG
-
-        if command -v fuser >/dev/null 2>&1; then
-          fuser -k "${SERVE_PORT}/tcp" || true
-        fi
-        nohup python3 -m http.server "$SERVE_PORT" --bind 127.0.0.1 --directory "$SERVE_DIR" \
-          >/dev/null 2>&1 &
+        docker run -d --name "$CONTAINER_NAME" \
+          --network "$NPM_NET_NAME" \
+          --network-alias "$NETWORK_ALIAS" \
+          --restart unless-stopped \
+          "$IMAGE"
         EOF
 
 deploy_stg:
@@ -109,13 +104,9 @@ deploy_stg:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
   variables:
-    DEPLOY_PATH: /var/www/blipzo-admin-stg
-    SERVE_DIR: /var/www/blipzo-admin-stg/browser
-    SERVE_PORT: "4201"
-    ADMIN_API_BASE_URL: http://127.0.0.1:5001
-    ADMIN_API_PREFIX: api
-    ADMIN_API_VERSION: v1.1
-    ADMIN_API_SEGMENT: admin
+    IMAGE: $CI_REGISTRY_IMAGE:stg
+    CONTAINER_NAME: blipzo-admin-stg
+    NETWORK_ALIAS: blipzo-admin-stg
 
 deploy_prod:
   extends: .deploy_template
@@ -125,10 +116,6 @@ deploy_prod:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   variables:
-    DEPLOY_PATH: /var/www/blipzo-admin-prod
-    SERVE_DIR: /var/www/blipzo-admin-prod/browser
-    SERVE_PORT: "4202"
-    ADMIN_API_BASE_URL: http://127.0.0.1:5000
-    ADMIN_API_PREFIX: api
-    ADMIN_API_VERSION: v1.1
-    ADMIN_API_SEGMENT: admin
+    IMAGE: $CI_REGISTRY_IMAGE:prod
+    CONTAINER_NAME: blipzo-admin-prod
+    NETWORK_ALIAS: blipzo-admin-prod
