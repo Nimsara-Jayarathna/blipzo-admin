@@ -6,6 +6,8 @@ on:
     paths:
       - "src/**"
       - "public/**"
+      - "Dockerfile"
+      - "nginx.conf"
       - "angular.json"
       - "package.json"
       - "package-lock.json"
@@ -16,6 +18,8 @@ on:
     paths:
       - "src/**"
       - "public/**"
+      - "Dockerfile"
+      - "nginx.conf"
       - "angular.json"
       - "package.json"
       - "package-lock.json"
@@ -25,50 +29,30 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: blipzo-admin-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  DOCKER_NETWORK: npm_default
 
 jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
       deploy_env: ${{ steps.vars.outputs.deploy_env }}
-      deploy_path: ${{ steps.vars.outputs.deploy_path }}
-      serve_dir: ${{ steps.vars.outputs.serve_dir }}
-      serve_port: ${{ steps.vars.outputs.serve_port }}
-      artifact_name: ${{ steps.vars.outputs.artifact_name }}
+      image: ${{ steps.vars.outputs.image }}
+      image_tag_env: ${{ steps.vars.outputs.image_tag_env }}
+      image_tag_sha: ${{ steps.vars.outputs.image_tag_sha }}
+      build_cfg: ${{ steps.vars.outputs.build_cfg }}
+      container_name: ${{ steps.vars.outputs.container_name }}
+      docker_network: ${{ steps.vars.outputs.docker_network }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set deployment variables
-        id: vars
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            DEPLOY_ENV="production"
-            DEPLOY_PATH="/var/www/blipzo-admin-prod"
-            SERVE_DIR="/var/www/blipzo-admin-prod/browser"
-            SERVE_PORT="4202"
-            ARTIFACT_NAME="admin-build-prod"
-          else
-            DEPLOY_ENV="staging"
-            DEPLOY_PATH="/var/www/blipzo-admin-stg"
-            SERVE_DIR="/var/www/blipzo-admin-stg/browser"
-            SERVE_PORT="4201"
-            ARTIFACT_NAME="admin-build-stg"
-          fi
-
-          echo "deploy_env=${DEPLOY_ENV}" >> "$GITHUB_OUTPUT"
-          echo "deploy_path=${DEPLOY_PATH}" >> "$GITHUB_OUTPUT"
-          echo "serve_dir=${SERVE_DIR}" >> "$GITHUB_OUTPUT"
-          echo "serve_port=${SERVE_PORT}" >> "$GITHUB_OUTPUT"
-          echo "artifact_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Use Node.js 20
         uses: actions/setup-node@v4
@@ -79,22 +63,105 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (dev -> development, main -> production)
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test -- --watch=false
+
+      - name: Set build/deploy variables
+        id: vars
         shell: bash
         run: |
           set -euo pipefail
+
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            npm run build -- --configuration production
+            DEPLOY_ENV="production"
+            IMAGE_TAG_ENV="prod"
+            BUILD_CFG="production"
+            CONTAINER_NAME="blipzo-admin-prod"
+            ADMIN_API_BASE_URL="${{ secrets.ADMIN_API_BASE_URL_PROD }}"
+            ADMIN_API_PREFIX="${{ secrets.ADMIN_API_PREFIX_PROD }}"
+            ADMIN_API_VERSION="${{ secrets.ADMIN_API_VERSION_PROD }}"
+            ADMIN_API_SEGMENT="${{ secrets.ADMIN_API_SEGMENT_PROD }}"
           else
-            npm run build -- --configuration development
+            DEPLOY_ENV="staging"
+            IMAGE_TAG_ENV="stg"
+            BUILD_CFG="development"
+            CONTAINER_NAME="blipzo-admin-stg"
+            ADMIN_API_BASE_URL="${{ secrets.ADMIN_API_BASE_URL_STG }}"
+            ADMIN_API_PREFIX="${{ secrets.ADMIN_API_PREFIX_STG }}"
+            ADMIN_API_VERSION="${{ secrets.ADMIN_API_VERSION_STG }}"
+            ADMIN_API_SEGMENT="${{ secrets.ADMIN_API_SEGMENT_STG }}"
           fi
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+          ADMIN_API_PREFIX="${ADMIN_API_PREFIX:-api}"
+          ADMIN_API_VERSION="${ADMIN_API_VERSION:-v1.1}"
+          ADMIN_API_SEGMENT="${ADMIN_API_SEGMENT:-admin}"
+
+          DOCKER_NETWORK_FROM_SECRET="${{ secrets.NPM_NET_NAME }}"
+          DOCKER_NETWORK_EFFECTIVE="${DOCKER_NETWORK_FROM_SECRET:-${DOCKER_NETWORK}}"
+
+          echo "::add-mask::$ADMIN_API_BASE_URL"
+          echo "::add-mask::$ADMIN_API_PREFIX"
+          echo "::add-mask::$ADMIN_API_VERSION"
+          echo "::add-mask::$ADMIN_API_SEGMENT"
+
+          echo "deploy_env=${DEPLOY_ENV}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "image_tag_env=${IMAGE_TAG_ENV}" >> "$GITHUB_OUTPUT"
+          echo "image_tag_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_cfg=${BUILD_CFG}" >> "$GITHUB_OUTPUT"
+          echo "container_name=${CONTAINER_NAME}" >> "$GITHUB_OUTPUT"
+          echo "docker_network=${DOCKER_NETWORK_EFFECTIVE}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "ADMIN_API_BASE_URL<<__EOF__"
+            printf '%s\n' "$ADMIN_API_BASE_URL"
+            echo "__EOF__"
+            echo "ADMIN_API_PREFIX<<__EOF__"
+            printf '%s\n' "$ADMIN_API_PREFIX"
+            echo "__EOF__"
+            echo "ADMIN_API_VERSION<<__EOF__"
+            printf '%s\n' "$ADMIN_API_VERSION"
+            echo "__EOF__"
+            echo "ADMIN_API_SEGMENT<<__EOF__"
+            printf '%s\n' "$ADMIN_API_SEGMENT"
+            echo "__EOF__"
+          } >> "$GITHUB_ENV"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
         with:
-          name: ${{ steps.vars.outputs.artifact_name }}
-          path: dist/blipzo-admin/
-          if-no-files-found: error
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (and push on push events)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: ${{ github.event_name == 'push' }}
+          build-args: |
+            BUILD_CONFIGURATION=${{ steps.vars.outputs.build_cfg }}
+            ADMIN_API_BASE_URL=${{ env.ADMIN_API_BASE_URL }}
+            ADMIN_API_PREFIX=${{ env.ADMIN_API_PREFIX }}
+            ADMIN_API_VERSION=${{ env.ADMIN_API_VERSION }}
+            ADMIN_API_SEGMENT=${{ env.ADMIN_API_SEGMENT }}
+          tags: |
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.image_tag_sha }}
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.image_tag_env }}
+            ${{ steps.vars.outputs.image }}:latest-${{ steps.vars.outputs.image_tag_env }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     runs-on: ubuntu-latest
@@ -106,18 +173,12 @@ jobs:
       SSH_PORT: ${{ secrets.SSH_PORT }}
       SSH_USER: ${{ secrets.SSH_USER }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      DEPLOY_PATH: ${{ needs.build.outputs.deploy_path }}
-      SERVE_DIR: ${{ needs.build.outputs.serve_dir }}
-      SERVE_PORT: ${{ needs.build.outputs.serve_port }}
-      ARTIFACT_NAME: ${{ needs.build.outputs.artifact_name }}
+      DOCKER_NETWORK: ${{ needs.build.outputs.docker_network }}
+      CONTAINER_NAME: ${{ needs.build.outputs.container_name }}
+      IMAGE: ${{ needs.build.outputs.image }}
+      SHA: ${{ needs.build.outputs.image_tag_sha }}
 
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: dist/blipzo-admin/
-
       - name: Prepare SSH key
         shell: bash
         run: |
@@ -134,41 +195,50 @@ jobs:
           fi
 
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           printf '%s' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
           ssh-keyscan -H -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
           echo "SSH_OPTS=-i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes" >> "$GITHUB_ENV"
 
-      - name: Create deploy directory
+      - name: Deploy (candidate -> health check -> final)
         shell: bash
         run: |
           set -euo pipefail
           ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'EOF'
+            "NPM_NET_NAME='${DOCKER_NETWORK}' CONTAINER_NAME='${CONTAINER_NAME}' IMAGE='${IMAGE}' SHA='${SHA}' bash -s" <<'EOF'
           set -euo pipefail
-          mkdir -p "$DEPLOY_PATH"
-          EOF
 
-      - name: Sync build to server
-        shell: bash
-        run: |
-          set -euo pipefail
-          rsync -az --delete \
-            -e "ssh $SSH_OPTS -p $SSH_PORT" \
-            dist/blipzo-admin/ \
-            "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
-
-      - name: Restart server (python http.server)
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "SERVE_DIR='$SERVE_DIR' SERVE_PORT='$SERVE_PORT' bash -s" <<'EOF'
-          set -euo pipefail
-          if command -v fuser >/dev/null 2>&1; then
-            fuser -k "${SERVE_PORT}/tcp" || true
+          if ! docker network inspect "$NPM_NET_NAME" >/dev/null 2>&1; then
+            docker network create --driver bridge "$NPM_NET_NAME"
           fi
-          nohup python3 -m http.server "$SERVE_PORT" --bind 127.0.0.1 --directory "$SERVE_DIR" \
-            >/dev/null 2>&1 &
+
+          docker pull "${IMAGE}:${SHA}"
+
+          CANDIDATE="${CONTAINER_NAME}-cand-${SHA}"
+          docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
+
+          docker run -d --name "$CANDIDATE" \
+            --network "$NPM_NET_NAME" \
+            --restart unless-stopped \
+            --label commit_sha="$SHA" \
+            "${IMAGE}:${SHA}"
+
+          # Generic health checks (not Angular-template-specific)
+          docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/ >/dev/null"
+          docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/runtime-config.js >/dev/null"
+
+          docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
+
+          docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+
+          docker run -d --name "$CONTAINER_NAME" \
+            --network "$NPM_NET_NAME" \
+            --network-alias blipzo-admin \
+            --restart unless-stopped \
+            --label commit_sha="$SHA" \
+            "${IMAGE}:${SHA}"
+
+          docker image prune -f --filter "until=72h" >/dev/null 2>&1 || true
           EOF
