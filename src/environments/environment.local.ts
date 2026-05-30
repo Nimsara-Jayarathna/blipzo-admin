@@ -8,3 +8,4 @@ export const environment = {
   adminUsersPageSize: 10,
   adminCurrenciesPageSize: 10,
 };
+
