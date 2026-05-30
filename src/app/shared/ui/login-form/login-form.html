@@ -1,0 +1,73 @@
+<form class="flex flex-col gap-5" [formGroup]="form()" (ngSubmit)="onSubmit()" novalidate>
+  @if (errorMessage()) {
+    <p
+      class="m-0 rounded-[0.6rem] border border-[rgba(255,125,125,0.4)] bg-[rgba(255,125,125,0.08)] px-4 py-3 text-[0.86rem] text-[#ff9d9d]"
+      role="alert"
+    >
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <div class="flex flex-col gap-2">
+    <label for="email" class="text-xs font-bold uppercase tracking-[0.1em] text-[#95a8be]"
+      >Email Address</label
+    >
+    <div class="relative">
+      <span
+        class="absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-[#8ea4bc]"
+        aria-hidden="true"
+        >@</span
+      >
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        formControlName="email"
+        placeholder="admin@enterprise.com"
+        class="box-border w-full rounded-[0.6rem] border border-[#3f5168] bg-[#0f1721] px-4 py-3 pl-9 text-base text-[#eaf1fa] placeholder:text-[#7f94ad] outline-none transition focus:border-[#9ab1cb] focus:shadow-[0_0_0_3px_rgba(154,177,203,0.2)]"
+      />
+    </div>
+    @if (hasError('email', 'required')) {
+      <p class="m-0 text-[0.82rem] text-[#ff7d7d]">Email is required.</p>
+    }
+    @if (hasError('email', 'email')) {
+      <p class="m-0 text-[0.82rem] text-[#ff7d7d]">Enter a valid email address.</p>
+    }
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label for="password" class="text-xs font-bold uppercase tracking-[0.1em] text-[#95a8be]"
+      >Password</label
+    >
+    <div class="relative">
+      <span
+        class="absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-[#8ea4bc]"
+        aria-hidden="true"
+        >•</span
+      >
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        formControlName="password"
+        placeholder="••••••••"
+        class="box-border w-full rounded-[0.6rem] border border-[#3f5168] bg-[#0f1721] px-4 py-3 pl-9 text-base text-[#eaf1fa] placeholder:text-[#7f94ad] outline-none transition focus:border-[#9ab1cb] focus:shadow-[0_0_0_3px_rgba(154,177,203,0.2)]"
+      />
+    </div>
+    @if (hasError('password', 'required')) {
+      <p class="m-0 text-[0.82rem] text-[#ff7d7d]">Password is required.</p>
+    }
+    @if (hasError('password', 'minlength')) {
+      <p class="m-0 text-[0.82rem] text-[#ff7d7d]">Password must be at least 8 characters.</p>
+    }
+  </div>
+
+  <button
+    type="submit"
+    [disabled]="form().disabled"
+    class="flex items-center justify-center gap-2 rounded-[0.7rem] bg-[#d5dce5] px-4 py-4 text-xl font-bold text-[#131c27] transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-70 sm:text-2xl"
+  >
+    <span>{{ form().disabled ? 'Signing in...' : 'Login' }}</span>
+    <span aria-hidden="true">→</span>
+  </button>
+</form>

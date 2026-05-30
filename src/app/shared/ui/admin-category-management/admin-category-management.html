@@ -1,0 +1,245 @@
+<section class="w-full">
+  @if (isLoading) {
+    <div
+      class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]"
+    >
+      Loading categories...
+    </div>
+  } @else if (errorMessage) {
+    <div
+      class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]"
+    >
+      <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
+      <button
+        type="button"
+        (click)="retry.emit()"
+        class="rounded-lg border border-[#3a4a5f] bg-[#253349] px-4 py-2 text-sm font-bold text-[#e3edfb] transition hover:bg-[#30415b]"
+      >
+        Retry
+      </button>
+    </div>
+  } @else if (data) {
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h3 class="m-0 text-[2.4rem] font-bold tracking-tight text-[#f2f8ff]">System Categories</h3>
+        <p class="mt-1 text-[1.1rem] text-[#9aabc2]">Configure global transaction categories.</p>
+      </div>
+      <button
+        type="button"
+        (click)="addCategory.emit()"
+        class="flex h-11 items-center gap-2 rounded-xl bg-[#2487f2] px-6 text-sm font-bold text-white transition hover:bg-[#1f78d8]"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        Add New Category
+      </button>
+    </div>
+
+    <section class="mb-8">
+      <div class="mb-3 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-[#8ea1bb]">star</span>
+        <h4 class="m-0 text-[1.5rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+          Default Categories
+        </h4>
+      </div>
+      <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] p-5">
+          <div class="mb-4 flex items-center justify-between">
+            <span
+              class="rounded bg-[rgba(16,185,129,0.12)] px-2.5 py-1 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#10d39f]"
+            >
+              Income
+            </span>
+            <span class="material-symbols-outlined text-[16px] text-[#9aabc2]">info</span>
+          </div>
+          <p class="mb-1 mt-0 text-[1rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">
+            Active Default Name
+          </p>
+          <p class="m-0 text-[2.4rem] font-bold text-[#f5f9ff]">
+            {{ data.defaults.income?.name || 'N/A' }}
+          </p>
+        </article>
+
+        <article class="rounded-2xl border border-[#32455d] bg-[#0b131f] p-5">
+          <div class="mb-4 flex items-center justify-between">
+            <span
+              class="rounded bg-[rgba(244,63,94,0.12)] px-2.5 py-1 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#ff547f]"
+            >
+              Expense
+            </span>
+            <span class="material-symbols-outlined text-[16px] text-[#9aabc2]">info</span>
+          </div>
+          <p class="mb-1 mt-0 text-[1rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">
+            Active Default Name
+          </p>
+          <p class="m-0 text-[2.4rem] font-bold text-[#f5f9ff]">
+            {{ data.defaults.expense?.name || 'N/A' }}
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <div class="mb-3 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-[#8ea1bb]">settings</span>
+        <h4 class="m-0 text-[1.5rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+          Global Settings
+        </h4>
+      </div>
+      <div class="rounded-2xl border border-[#32455d] bg-[#0b131f] p-5">
+        <div class="flex flex-wrap items-end gap-3">
+          <div>
+            <p
+              class="mb-2 mt-0 text-[1rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >
+              Global Category Limit
+            </p>
+            <div class="flex items-center gap-2">
+              <form [formGroup]="settingsForm">
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  formControlName="defaultCategoryLimit"
+                  class="h-10 w-24 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-[1.3rem] font-semibold text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+                />
+              </form>
+              <button
+                type="button"
+                (click)="updateLimit.emit()"
+                [disabled]="isSavingLimit"
+                class="h-10 rounded-lg border border-[#4b607b] bg-[#2b3d54] px-4 text-sm font-bold text-[#e9f2ff] transition hover:bg-[#365070] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {{ isSavingLimit ? 'Updating...' : 'Update' }}
+              </button>
+            </div>
+            @if (settingsMessage) {
+              <p class="mt-2 text-sm text-[#9aabc2]">{{ settingsMessage }}</p>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="m-0 text-[2rem] font-bold text-[#f5f9ff]">All Categories</h3>
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#8397b1] text-[16px]"
+              >search</span
+            >
+            <form [formGroup]="searchForm">
+              <input
+                type="text"
+                formControlName="search"
+                (input)="search.emit()"
+                placeholder="Search categories..."
+                class="h-10 w-72 rounded-xl border border-[#30445f] bg-[#0f1724] pl-9 pr-3 text-sm text-[#dce8f8] placeholder:text-[#768aa4] outline-none focus:border-[#3e628d]"
+              />
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f]">
+        <table class="w-full min-w-[980px] border-collapse">
+          <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
+            <tr>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Type
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Set As Default
+              </th>
+              <th
+                class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (filteredCategories.length === 0) {
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-sm text-[#95a7bf]">No categories found.</td>
+              </tr>
+            } @else {
+              @for (category of filteredCategories; track trackByCategoryId($index, category)) {
+                <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
+                  <td class="px-6 py-4 text-[1.6rem] font-semibold text-[#f4f8ff]">
+                    {{ category.name }}
+                  </td>
+                  <td class="px-6 py-4">
+                    <span [class]="typeClass(category.type)">{{ category.type }}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    @if (category.isDefault) {
+                      <span
+                        class="inline-flex items-center gap-1.5 text-[1rem] font-semibold text-[#2e9bff]"
+                      >
+                        <span class="h-2 w-2 rounded-full bg-[#2e9bff]"></span>
+                        Default
+                      </span>
+                    } @else {
+                      <span class="text-[1rem] italic text-[#8ea1bb]">Standard</span>
+                    }
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <button
+                      type="button"
+                      (click)="setDefault.emit(category)"
+                      class="grid h-6 w-6 place-items-center rounded-full border transition"
+                      [class]="
+                        category.isDefault
+                          ? 'border-[#2e9bff] text-[#2e9bff]'
+                          : 'border-[#7f93ac] text-[#8ea1bb] hover:border-[#2e9bff] hover:text-[#2e9bff]'
+                      "
+                    >
+                      <span class="material-symbols-outlined text-[18px]">
+                        {{ category.isDefault ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                      </span>
+                    </button>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        (click)="editCategory.emit(category)"
+                        class="text-[#d7e7fc] transition hover:text-[#2e9bff]"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deleteCategory.emit(category)"
+                        [disabled]="category.isDefault"
+                        class="text-[#9ab0ca] transition hover:text-[#ff547f] disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</section>

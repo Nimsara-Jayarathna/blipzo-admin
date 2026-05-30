@@ -1,0 +1,236 @@
+@if (open) {
+  <div class="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm"></div>
+  <section class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div
+      class="w-full max-w-[720px] overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f] shadow-2xl"
+    >
+      <div class="flex items-start justify-between border-b border-[#2b3a4f] px-6 py-5">
+        <div>
+          <h3 class="text-[1.7rem] font-bold leading-tight text-[#f1f6ff]">User Profile</h3>
+          @if (profile) {
+            <p class="mt-1 text-sm text-[#8ea1bb]">
+              Managing User ID #{{ displayUserId(profile.id) }}
+            </p>
+          }
+        </div>
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="rounded-lg p-2 text-[#a0b4cd] transition hover:bg-[#1b2a3b] hover:text-[#eaf3ff]"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      @if (loading) {
+        <div class="px-6 py-10 text-center text-[#a7b8cf]">Loading profile...</div>
+      } @else if (!profile) {
+        <div class="px-6 py-10 text-center text-[#ff8da7]">Unable to load profile data.</div>
+      } @else {
+        <div class="max-h-[70vh] overflow-y-auto px-6 py-5">
+          <div class="mb-5 flex items-center gap-4">
+            <div
+              class="flex h-16 w-16 items-center justify-center rounded-full border border-[#41526a] bg-[#1b2a3b] text-[#8ea1bb]"
+            >
+              <span class="material-symbols-outlined text-3xl">person</span>
+            </div>
+            <div>
+              <p class="text-3xl font-bold text-[#f4f9ff]">{{ profile.name }}</p>
+              <p class="text-sm font-semibold uppercase tracking-wide text-[#8096b3]">
+                {{ profile.role }}
+              </p>
+            </div>
+          </div>
+
+          <form class="grid grid-cols-1 gap-4 md:grid-cols-2" [formGroup]="profileForm">
+            <div>
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >User ID</label
+              >
+              <p class="text-xl font-bold text-[#eaf3ff]">#{{ displayUserId(profile.id) }}</p>
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >Status</label
+              >
+              <select
+                formControlName="status"
+                class="h-10 w-full rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm font-semibold text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+              >
+                @for (status of statusOptions; track status) {
+                  <option [value]="status">{{ status }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >Email Address</label
+              >
+              <input
+                type="text"
+                formControlName="email"
+                class="h-10 w-full rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+              />
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >Category Limit</label
+              >
+              <input
+                type="number"
+                min="0"
+                step="1"
+                formControlName="categoryLimit"
+                class="h-10 w-full rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm font-semibold text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+              />
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >Default Currency</label
+              >
+              <p class="text-base font-semibold text-[#eaf3ff]">{{ profile.defaultCurrency }}</p>
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >Created Date</label
+              >
+              <p class="text-base font-semibold text-[#eaf3ff]">
+                {{ formatDateTime(profile.createdAt) }}
+              </p>
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                >Last Login</label
+              >
+              <p class="text-base font-semibold text-[#eaf3ff]">
+                {{ formatDateTime(profile.lastLoginAt) }}
+              </p>
+            </div>
+          </form>
+
+          <div class="mt-6">
+            <label
+              class="mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >Account Actions</label
+            >
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <button
+                type="button"
+                (click)="resetPassword.emit()"
+                class="flex h-10 items-center justify-center gap-2 rounded-lg border border-[#3b4b61] bg-[#111d2b] px-4 text-sm font-bold text-[#e8f0fc] transition hover:bg-[#1a2a3d]"
+              >
+                <span class="material-symbols-outlined text-[16px]">lock_reset</span>
+                Reset Password
+              </button>
+              <button
+                type="button"
+                (click)="forceLogout.emit()"
+                class="flex h-10 items-center justify-center gap-2 rounded-lg border border-[#7a3345] bg-[#26131a] px-4 text-sm font-bold text-[#ff6f92] transition hover:bg-[#301922]"
+              >
+                <span class="material-symbols-outlined text-[16px]">power_settings_new</span>
+                Force Logout
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <label
+              class="mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >Activity History</label
+            >
+            <div class="overflow-hidden rounded-xl border border-[#32455d]">
+              <table class="w-full min-w-[420px]">
+                <thead class="bg-[#1a2534]">
+                  <tr>
+                    <th
+                      class="px-4 py-2 text-left text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                    >
+                      Event
+                    </th>
+                    <th
+                      class="px-4 py-2 text-left text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                    >
+                      Details
+                    </th>
+                    <th
+                      class="px-4 py-2 text-left text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+                    >
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#2b3a4f]">
+                  @if (activity.length === 0) {
+                    <tr>
+                      <td class="px-4 py-3 text-sm text-[#9ab0ca]" colspan="3">
+                        No activity available.
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (item of activity; track trackByActivityIndex($index)) {
+                      <tr>
+                        <td class="px-4 py-2 text-sm font-semibold text-[#f4f9ff]">
+                          {{ item.event }}
+                        </td>
+                        <td class="px-4 py-2 text-sm text-[#9ab0ca]">{{ item.details }}</td>
+                        <td class="px-4 py-2 text-sm text-[#9ab0ca]">
+                          {{ formatDateTime(item.date) }}
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          @if (errorMessage) {
+            <p
+              class="mt-4 rounded-lg border border-[#7a3345] bg-[#26131a] px-3 py-2 text-sm text-[#ff9ab2]"
+            >
+              {{ errorMessage }}
+            </p>
+          }
+          @if (successMessage) {
+            <p
+              class="mt-4 rounded-lg border border-[#2b6d5c] bg-[#10241f] px-3 py-2 text-sm text-[#86f0cf]"
+            >
+              {{ successMessage }}
+            </p>
+          }
+        </div>
+
+        <div class="flex gap-3 border-t border-[#2b3a4f] bg-[#131f2d] px-6 py-4">
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="h-10 flex-1 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-4 text-sm font-bold text-[#b8c9de] transition hover:bg-[#233248]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="save.emit()"
+            [disabled]="saving"
+            class="h-10 flex-[1.4] rounded-lg bg-[#2583ea] px-4 text-sm font-bold text-white transition hover:bg-[#1f75d1] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ saving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+}

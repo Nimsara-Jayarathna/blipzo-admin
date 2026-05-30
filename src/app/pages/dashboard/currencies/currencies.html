@@ -1,0 +1,31 @@
+<app-admin-currency-list
+  [isLoading]="isLoading"
+  [errorMessage]="errorMessage"
+  [filterForm]="filterForm"
+  [filterStatusOptions]="filterStatusOptions"
+  [pagedCurrencies]="pagedCurrencies"
+  [filteredCurrencies]="filteredCurrencies"
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  [showPagination]="showPagination"
+  [showingStart]="showingStart"
+  [showingEnd]="showingEnd"
+  [visiblePages]="visiblePages"
+  (retry)="onRetry()"
+  (applyFilter)="onApplyFilter()"
+  (pageChange)="onPageChange($event)"
+  (openCreate)="openCreateModal()"
+  (edit)="openEditModal($event)"
+  (toggleStatus)="onToggleStatus($event)"
+  (setDefault)="onSetDefault($event)"
+/>
+
+<app-admin-currency-modal
+  [open]="isModalOpen"
+  [title]="modalTitle()"
+  [form]="currencyForm"
+  [saving]="isSaving"
+  [errorMessage]="modalErrorMessage"
+  (close)="closeModal()"
+  (save)="saveCurrency()"
+/>

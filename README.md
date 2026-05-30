@@ -54,6 +54,106 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Admin API Configuration
+
+The admin frontend builds API URLs from runtime config first, with environment fallback.
+
+Runtime file:
+
+- `public/runtime-config.js` (copied to deploy output as `runtime-config.js`)
+
+Runtime keys:
+
+- `apiBaseUrl`
+- `apiPrefix`
+- `apiVersion`
+- `adminApiSegment`
+
+Fallback environment files:
+
+- `src/environments/environment.ts`
+- `src/environments/environment.development.ts`
+
+Route format:
+
+`{apiBaseUrl}/{apiPrefix}/{apiVersion}/{adminApiSegment}/{path}`
+
+Example:
+
+`/api/v1.1/admin/auth/login`
+
+### Authentication mode
+
+- Cookie-based auth (`HttpOnly` + `Secure`) is used.
+- Frontend does not use `localStorage` for tokens.
+- Admin API requests are sent with `withCredentials: true`.
+- Backend should enforce `15 minute` access-token lifetime.
+
+## API Contract Documentation
+
+Admin API contract (routes, request/response envelopes, login schema) is documented in:
+
+- `docs/api/admin-api-contract.md`
+
+## Naming Conventions
+
+Use these conventions for quick readability and consistency.
+
+- Folders and files: `kebab-case`
+  - Example: `src/app/shared/ui/global-request-feedback-modal`
+- Angular components:
+  - File names: `feature-name.ts`, `feature-name.html`
+  - Class names: `PascalCase`
+  - Example: `dashboard-recent-events.ts` -> `DashboardRecentEventsComponent`
+- Services:
+  - File names end with `.service.ts`
+  - Class names end with `Service`
+  - Example: `users.service.ts` -> `UsersService`
+- Guards/interceptors:
+  - File names include role/scope clearly
+  - Example: `auth.guard.ts`, `http-request-feedback.interceptor.ts`
+- Models/types:
+  - File names end with `.models.ts`
+  - Interfaces/types in `PascalCase`
+  - Example: `users.models.ts` -> `AdminUser`, `UserStatus`
+- Environment keys:
+  - `camelCase`
+  - Example: `adminUsersPageSize`, `apiBaseUrl`
+- API docs:
+  - One overview + focused docs per endpoint group
+  - Example: `admin-api-contract.md` + `admin-auth-api.md` + `admin-dashboard-api.md` + `users-api.md`
+
+### Dashboard API (aggregate endpoint)
+
+Dashboard first-load data is fetched from one endpoint with params:
+
+- `GET /api/{version}/admin/dashboard?period=30d|90d&eventsLimit=6`
+
+Frontend service:
+
+- `src/app/core/dashboard/dashboard.service.ts`
+
+Dashboard implementation:
+
+- Shell layout: `src/app/pages/dashboard/dashboard.ts`
+- Dashboard page: `src/app/pages/dashboard/home/dashboard-home.ts`
+- Reusable UI widgets: `src/app/shared/ui/dashboard-*`
+
+## Global API Request Modal
+
+All admin API requests are covered by a centralized blocking request modal.
+
+- Interceptor: `src/app/core/http/http-request-feedback.interceptor.ts`
+- Feedback service: `src/app/core/http/http-request-feedback.service.ts`
+- Global UI component: `src/app/shared/ui/global-request-feedback-modal`
+
+Context tokens for per-request behavior:
+
+- `SKIP_HTTP_REQUEST_FEEDBACK`
+- `SHOW_HTTP_REQUEST_SUCCESS`
+- `HTTP_REQUEST_LOADING_MESSAGE`
+- `HTTP_REQUEST_SUCCESS_MESSAGE`
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

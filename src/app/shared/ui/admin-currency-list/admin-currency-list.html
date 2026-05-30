@@ -1,0 +1,252 @@
+<section class="w-full">
+  @if (isLoading) {
+    <div
+      class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]"
+    >
+      Loading currencies...
+    </div>
+  } @else if (errorMessage) {
+    <div
+      class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]"
+    >
+      <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
+      <button
+        type="button"
+        (click)="retry.emit()"
+        class="rounded-lg border border-[#3a4a5f] bg-[#253349] px-4 py-2 text-sm font-bold text-[#e3edfb] transition hover:bg-[#30415b]"
+      >
+        Retry
+      </button>
+    </div>
+  } @else {
+    <div class="mb-5 flex items-center justify-end">
+      <button
+        type="button"
+        (click)="openCreate.emit()"
+        class="flex h-10 items-center gap-2 rounded-xl bg-[#2487f2] px-5 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:bg-[#1f78d8]"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        Add New Currency
+      </button>
+    </div>
+
+    <section class="mb-7 rounded-2xl border border-[#32455d] bg-[#0b131f] p-5">
+      <form
+        class="grid grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-[0.8fr_1fr_0.8fr_0.9fr_auto]"
+        [formGroup]="filterForm"
+        (ngSubmit)="applyFilter.emit()"
+      >
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Code</label
+          >
+          <input
+            type="text"
+            formControlName="code"
+            placeholder="e.g. USD"
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] placeholder:text-[#6f8096] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Name</label
+          >
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Search name..."
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] placeholder:text-[#6f8096] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Symbol</label
+          >
+          <input
+            type="text"
+            formControlName="symbol"
+            placeholder="e.g. $"
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] placeholder:text-[#6f8096] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Status</label
+          >
+          <select
+            formControlName="status"
+            class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+          >
+            @for (status of filterStatusOptions; track status) {
+              <option [value]="status">{{ status === 'ALL' ? 'All Status' : status }}</option>
+            }
+          </select>
+        </div>
+        <button
+          type="submit"
+          class="h-10 rounded-lg border border-[#445872] bg-[#2d3d53] px-5 text-sm font-bold uppercase tracking-wide text-[#f1f6ff] transition hover:bg-[#38506f]"
+        >
+          Apply Filter
+        </button>
+      </form>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f]">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[880px] border-collapse">
+          <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
+            <tr>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Code
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Symbol
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (pagedCurrencies.length === 0) {
+              <tr>
+                <td class="px-6 py-8 text-sm text-[#95a7bf]" colspan="5">
+                  No currencies found for selected filters.
+                </td>
+              </tr>
+            } @else {
+              @for (currency of pagedCurrencies; track trackByCurrencyId($index, currency)) {
+                <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
+                  <td
+                    class="px-6 py-5 text-[1.6rem] font-bold"
+                    [class]="currency.isDefault ? 'text-[#2e9bff]' : 'text-[#d8e5f8]'"
+                  >
+                    {{ currency.code }}
+                  </td>
+                  <td class="px-6 py-5 text-[1.6rem] font-semibold text-[#f4f8ff]">
+                    {{ currency.name }}
+                  </td>
+                  <td class="px-6 py-5 text-center text-[1.7rem] font-bold text-[#f4f8ff]">
+                    {{ currency.symbol }}
+                  </td>
+                  <td class="px-6 py-5">
+                    @if (currency.isDefault) {
+                      <span [class]="statusClass(currency)">Default</span>
+                    } @else {
+                      <span [class]="statusClass(currency)">
+                        <span
+                          class="h-2 w-2 rounded-full"
+                          [class]="currency.isActive ? 'bg-[#16d3a5]' : 'bg-[#7388a3]'"
+                        ></span>
+                        {{ currency.isActive ? 'Enabled' : 'Disabled' }}
+                      </span>
+                    }
+                  </td>
+                  <td class="px-6 py-5">
+                    <div class="flex items-center justify-end gap-4">
+                      <button
+                        type="button"
+                        (click)="toggleStatus.emit(currency)"
+                        [disabled]="currency.isDefault"
+                        class="relative h-6 w-11 rounded-full transition disabled:cursor-not-allowed disabled:opacity-40"
+                        [class]="currency.isActive ? 'bg-[#2e9bff]' : 'bg-[#2f3a4a]'"
+                        [attr.aria-label]="'Toggle status for ' + currency.code"
+                      >
+                        <span
+                          class="absolute top-0.5 h-5 w-5 rounded-full bg-white transition"
+                          [class]="currency.isActive ? 'right-0.5' : 'left-0.5'"
+                        ></span>
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="setDefault.emit(currency)"
+                        class="grid h-6 w-6 place-items-center rounded-full border transition"
+                        [class]="
+                          currency.isDefault
+                            ? 'border-[#2e9bff] text-[#2e9bff]'
+                            : 'border-[#7f93ac] text-[#8ea1bb] hover:border-[#2e9bff] hover:text-[#2e9bff]'
+                        "
+                        [attr.aria-label]="'Set ' + currency.code + ' as default'"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">
+                          {{
+                            currency.isDefault ? 'radio_button_checked' : 'radio_button_unchecked'
+                          }}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="edit.emit(currency)"
+                        class="text-[#d7e7fc] transition hover:text-[#2e9bff]"
+                        [attr.aria-label]="'Edit ' + currency.code"
+                      >
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-between border-t border-[#2b3a4f] px-6 py-4">
+        <span class="text-sm text-[#8ea1bb]">
+          Showing {{ showingStart }}-{{ showingEnd }} of {{ filteredCurrencies.length }} currencies
+        </span>
+        @if (showPagination) {
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="pageChange.emit(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              class="rounded-md bg-[#2b394c] px-3 py-1.5 text-xs font-bold text-[#dbe7f8] transition hover:bg-[#364b65] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Prev
+            </button>
+            @for (page of visiblePages; track page) {
+              <button
+                type="button"
+                (click)="pageChange.emit(page)"
+                [class]="
+                  page === currentPage
+                    ? 'rounded-md bg-[#445872] px-3 py-1.5 text-xs font-bold text-white'
+                    : 'rounded-md px-3 py-1.5 text-xs font-bold text-[#dbe7f8] transition hover:bg-[#2b394c]'
+                "
+              >
+                {{ page }}
+              </button>
+            }
+            <button
+              type="button"
+              (click)="pageChange.emit(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              class="rounded-md bg-[#2b394c] px-3 py-1.5 text-xs font-bold text-[#dbe7f8] transition hover:bg-[#364b65] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</section>

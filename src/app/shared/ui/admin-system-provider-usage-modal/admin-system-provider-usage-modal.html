@@ -1,0 +1,107 @@
+@if (open) {
+  <div
+    class="fixed inset-0 z-[10030] bg-black/75 backdrop-blur-sm"
+    (click)="emitClose()"
+    aria-hidden="true"
+  ></div>
+
+  <section
+    class="fixed inset-0 z-[10031] flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-[#32455d] bg-[#111821] shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="flex items-center justify-between border-b border-[#2b3b4f] px-6 py-4">
+        <h3 class="m-0 text-lg font-bold text-[#f2f8ff]">Provider Usage History</h3>
+        <button
+          type="button"
+          (click)="emitClose()"
+          class="text-[#90a3be] transition hover:text-white"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <div class="overflow-y-auto p-6">
+        @if (loading) {
+          <div class="flex min-h-40 items-center justify-center text-[#9fb0c7]">
+            Loading usage history...
+          </div>
+        } @else if (errorMessage) {
+          <div class="flex min-h-40 items-center justify-center text-[#ff8da7]">
+            {{ errorMessage }}
+          </div>
+        } @else if (data) {
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <article class="rounded-xl border border-[#314256] bg-[#121d2a] p-4">
+              <p class="m-0 text-xs uppercase tracking-[0.08em] text-[#8ea1bb]">Usage Summary</p>
+              <p class="mt-3 text-2xl font-bold text-[#f5fbff]">
+                {{ data.summary.sent }} / {{ data.summary.limit }}
+              </p>
+              <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[#2c3c52]">
+                <div
+                  class="h-full bg-[#2487f2]"
+                  [style.width]="usageWidth(data.summary.usagePct)"
+                ></div>
+              </div>
+            </article>
+
+            <article class="rounded-xl border border-[#314256] bg-[#121d2a] p-4">
+              <p class="m-0 text-xs uppercase tracking-[0.08em] text-[#8ea1bb]">Success Rate</p>
+              <p class="mt-3 text-2xl font-bold text-[#f5fbff]">{{ data.summary.successRate }}%</p>
+              <p class="mt-2 text-xs text-[#94a8c1]">Failed sends: {{ data.summary.failed }}</p>
+            </article>
+
+            <article class="rounded-xl border border-[#314256] bg-[#121d2a] p-4">
+              <p class="m-0 text-xs uppercase tracking-[0.08em] text-[#8ea1bb]">Selected Date</p>
+              <p class="mt-3 text-2xl font-bold text-[#f5fbff]">{{ data.selectedDate }}</p>
+            </article>
+          </div>
+
+          <div class="mt-6 rounded-xl border border-[#314256] bg-[#121d2a] p-4">
+            <p class="m-0 text-xs uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Hourly Distribution
+            </p>
+            <div class="mt-4 flex h-32 items-end gap-1">
+              @for (item of data.hourlyDistribution; track $index) {
+                <div
+                  class="flex-1 rounded-t-sm bg-[#3a4c62]"
+                  [style.height]="barHeight(item.count)"
+                ></div>
+              }
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-xl border border-[#314256] bg-[#121d2a] p-4">
+            <p class="m-0 text-xs uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Daily Trend (7 days)
+            </p>
+            <div class="mt-4 space-y-2">
+              @for (day of data.history; track day.date) {
+                <div class="flex items-center justify-between rounded-md bg-[#1a2737] px-3 py-2">
+                  <span class="text-sm text-[#d4e0f0]">{{ day.date }}</span>
+                  <span class="text-xs text-[#9fb2cb]"
+                    >{{ day.sent }} / {{ day.limit }} ({{ day.usagePct }}%)</span
+                  >
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <footer class="flex justify-end border-t border-[#2b3b4f] bg-[#16202d] px-6 py-4">
+        <button
+          type="button"
+          (click)="emitClose()"
+          class="rounded-lg bg-[#2f4159] px-5 py-2 text-sm font-bold text-[#f0f6ff] transition hover:bg-[#3a5270]"
+        >
+          Close
+        </button>
+      </footer>
+    </div>
+  </section>
+}

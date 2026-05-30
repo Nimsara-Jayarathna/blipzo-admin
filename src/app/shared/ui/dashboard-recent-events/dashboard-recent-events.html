@@ -1,0 +1,62 @@
+<section class="flex min-h-[44rem] flex-col gap-4">
+  <header class="flex items-center justify-between gap-3">
+    <h3 class="m-0 whitespace-nowrap text-[2.05rem] font-bold tracking-tight text-[#f5f8fe]">
+      Recent System Events
+    </h3>
+    <button
+      type="button"
+      class="text-[1.1rem] font-bold text-[#2994ff] transition hover:text-[#53a8ff]"
+    >
+      View All
+    </button>
+  </header>
+
+  <div class="overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f]">
+    <table class="w-full border-collapse">
+      <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
+        <tr>
+          <th
+            class="px-5 py-4 text-left text-[0.82rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+          >
+            Level
+          </th>
+          <th
+            class="px-5 py-4 text-left text-[0.82rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+          >
+            Event
+          </th>
+          <th
+            class="px-5 py-4 text-right text-[0.82rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+          >
+            Time
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (events().length === 0) {
+          <tr>
+            <td class="px-5 py-5 text-[1.05rem] text-[#96a9c2]" colspan="3">
+              No events available.
+            </td>
+          </tr>
+        } @else {
+          @for (event of events(); track event.message + event.occurredAt) {
+            <tr
+              class="border-t border-[#2b3a4f] align-top text-[#e7eefc] transition hover:bg-[#131d2a]"
+            >
+              <td class="px-5 py-4">
+                <span [class]="levelChipClass(event.level)">{{ event.level }}</span>
+              </td>
+              <td class="px-5 py-4 text-[1.05rem] font-medium leading-tight text-[#f3f8ff]">
+                {{ event.message }}
+              </td>
+              <td class="px-5 py-4 text-right text-[0.92rem] text-[#99a9bd]">
+                {{ event.occurredAt }}
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

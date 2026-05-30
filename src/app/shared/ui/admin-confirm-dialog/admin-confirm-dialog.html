@@ -1,0 +1,38 @@
+@if (open) {
+  <div
+    class="fixed inset-0 z-[10020] bg-black/75 backdrop-blur-sm"
+    (click)="emitCancel()"
+    aria-hidden="true"
+  ></div>
+
+  <section
+    class="fixed inset-0 z-[10021] flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div [class]="cardClass()" (click)="$event.stopPropagation()">
+      <div class="px-6 py-5">
+        <h4 [class]="titleClass()">{{ title }}</h4>
+        <p [class]="messageClass()">{{ message }}</p>
+      </div>
+      <div [class]="footerClass()">
+        <button
+          type="button"
+          (click)="emitCancel()"
+          [disabled]="loading"
+          [class]="cancelButtonClass()"
+        >
+          {{ cancelLabel }}
+        </button>
+        <button
+          type="button"
+          (click)="emitConfirm()"
+          [disabled]="loading"
+          [class]="confirmButtonClass()"
+        >
+          {{ loading ? 'Please wait...' : confirmLabel }}
+        </button>
+      </div>
+    </div>
+  </section>
+}

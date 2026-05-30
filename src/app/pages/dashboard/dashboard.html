@@ -1,0 +1,134 @@
+<div class="flex min-h-screen bg-gradient-to-b from-[#081321] to-[#0a1b31] text-slate-100">
+  <aside
+    class="flex w-[276px] shrink-0 flex-col border-r border-[#243044] bg-[#161c24] max-lg:w-full max-lg:border-b max-lg:border-r-0"
+  >
+    <div class="flex items-center gap-3 px-5 py-7">
+      <div class="grid h-9 w-9 place-items-center rounded-md bg-[#137fec] text-white">
+        <span class="material-symbols-outlined text-[20px]">shield_person</span>
+      </div>
+      <h2 class="m-0 text-[1.35rem] font-semibold tracking-tight text-[#aab5c2]">BLIPZO ADMIN</h2>
+    </div>
+
+    <nav class="flex flex-1 flex-col gap-1 px-4 pb-4">
+      <a
+        routerLink="/dashboard"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="bg-[rgba(19,127,236,0.16)] text-white border border-[rgba(19,127,236,0.2)] [&_.nav-icon]:text-[#137fec]"
+        class="group flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-[1.05rem] font-medium text-[#9caac0] no-underline transition hover:bg-[#1f2732] hover:text-white"
+      >
+        <span
+          class="material-symbols-outlined nav-icon text-[22px] text-[#9caac0] transition-colors group-hover:text-[#137fec]"
+        >
+          dashboard
+        </span>
+        Dashboard
+      </a>
+      <a
+        routerLink="users"
+        routerLinkActive="bg-[rgba(19,127,236,0.16)] text-white border border-[rgba(19,127,236,0.2)] [&_.nav-icon]:text-[#137fec]"
+        class="group flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-[1.05rem] font-medium text-[#9caac0] no-underline transition hover:bg-[#1f2732] hover:text-white"
+      >
+        <span
+          class="material-symbols-outlined nav-icon text-[22px] text-[#9caac0] transition-colors group-hover:text-[#137fec]"
+        >
+          group
+        </span>
+        Users
+      </a>
+      <a
+        routerLink="currencies"
+        routerLinkActive="bg-[rgba(19,127,236,0.16)] text-white border border-[rgba(19,127,236,0.2)] [&_.nav-icon]:text-[#137fec]"
+        class="group flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-[1.05rem] font-medium text-[#9caac0] no-underline transition hover:bg-[#1f2732] hover:text-white"
+      >
+        <span
+          class="material-symbols-outlined nav-icon text-[22px] text-[#9caac0] transition-colors group-hover:text-[#137fec]"
+        >
+          payments
+        </span>
+        Currencies
+      </a>
+      <a
+        routerLink="categories"
+        routerLinkActive="bg-[rgba(19,127,236,0.16)] text-white border border-[rgba(19,127,236,0.2)] [&_.nav-icon]:text-[#137fec]"
+        class="group flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-[1.05rem] font-medium text-[#9caac0] no-underline transition hover:bg-[#1f2732] hover:text-white"
+      >
+        <span
+          class="material-symbols-outlined nav-icon text-[22px] text-[#9caac0] transition-colors group-hover:text-[#137fec]"
+        >
+          category
+        </span>
+        Categories
+      </a>
+      <a
+        routerLink="system"
+        routerLinkActive="bg-[rgba(19,127,236,0.16)] text-white border border-[rgba(19,127,236,0.2)] [&_.nav-icon]:text-[#137fec]"
+        class="group flex items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-[1.05rem] font-medium text-[#9caac0] no-underline transition hover:bg-[#1f2732] hover:text-white"
+      >
+        <span
+          class="material-symbols-outlined nav-icon text-[22px] text-[#9caac0] transition-colors group-hover:text-[#137fec]"
+        >
+          settings
+        </span>
+        System
+      </a>
+    </nav>
+
+    <div class="border-t border-[#243044] p-4">
+      <button
+        class="flex w-full items-center justify-center gap-2 rounded-xl border border-[rgba(244,63,94,0.25)] bg-[rgba(190,24,93,0.12)] px-4 py-3 text-xl font-bold text-[#f43f5e] transition hover:bg-[rgba(190,24,93,0.2)] disabled:cursor-not-allowed disabled:opacity-60"
+        type="button"
+        [disabled]="isSigningOut"
+        (click)="onLogout()"
+      >
+        <span class="material-symbols-outlined text-[18px]">logout</span>
+        {{ isSigningOut ? 'Logging out...' : 'Logout' }}
+      </button>
+    </div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <header
+      class="sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 border-b border-[#243044] bg-[#0f1620] px-8"
+    >
+      <div class="flex items-center gap-4">
+        <h1 class="m-0 text-[1.95rem] font-bold tracking-tight text-[#f8fbff]">{{ pageTitle }}</h1>
+        <span
+          class="rounded-md border border-[#3a4757] bg-[#1d2733] px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[#a2b1c3]"
+        >
+          {{ pageChip }}
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div
+          class="flex items-center gap-2 rounded-xl border border-[#3a4757] bg-[#1c2531] px-3 py-1.5"
+        >
+          <div class="grid h-7 w-7 place-items-center rounded-full bg-[#344254] text-[#dce5f0]">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+              <path
+                d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.3 0-6 1.34-6 3v1h12v-1c0-1.66-2.7-3-6-3Z"
+              />
+            </svg>
+          </div>
+          <span class="text-[1.2rem] font-medium text-[#e6eef8]">sys_admin_01</span>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Notifications"
+          class="text-[#9ba9bf] transition hover:text-[#5ea8ff]"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6" aria-hidden="true">
+            <path
+              d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1l-2-2Z"
+            />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="mx-auto w-full max-w-[1450px] px-8 py-7">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

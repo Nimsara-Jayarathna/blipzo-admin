@@ -1,0 +1,139 @@
+@if (open) {
+  <div class="fixed inset-0 z-[10030] bg-black/70 backdrop-blur-sm"></div>
+  <section class="fixed inset-0 z-[10031] flex items-center justify-center p-6">
+    <div
+      class="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f] shadow-2xl"
+    >
+      <div class="flex items-center justify-between border-b border-[#2b3a4f] px-6 py-5">
+        <div class="flex items-center gap-3">
+          <div
+            class="grid h-9 w-9 place-items-center rounded-lg bg-[rgba(19,127,236,0.15)] text-[#2e9bff]"
+          >
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+          </div>
+          <h3 class="m-0 text-4xl font-bold tracking-tight text-[#f1f6ff]">{{ title }}</h3>
+        </div>
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="rounded-lg p-2 text-[#9ab0ca] transition hover:bg-[#1b2a3b] hover:text-[#eaf3ff]"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form class="space-y-5 px-6 py-6" [formGroup]="form">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label
+              class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >Currency Code</label
+            >
+            <input
+              formControlName="code"
+              type="text"
+              placeholder="e.g. USD"
+              class="h-10 w-full rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+            />
+          </div>
+          <div>
+            <label
+              class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >Currency Symbol</label
+            >
+            <input
+              formControlName="symbol"
+              type="text"
+              placeholder="e.g. $"
+              class="h-10 w-full rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label
+            class="mb-1 block text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Currency Name</label
+          >
+          <input
+            formControlName="name"
+            type="text"
+            placeholder="e.g. US Dollar"
+            class="h-10 w-full rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
+          />
+        </div>
+
+        <div class="space-y-4 pt-1">
+          <div
+            class="flex items-center justify-between rounded-xl border border-[#2e4159] bg-[#1b2533] p-3"
+          >
+            <div>
+              <p class="m-0 text-[1.6rem] font-semibold text-[#e6eef9]">Enabled</p>
+              <p class="m-0 text-sm text-[#8ea1bb]">Allow users to select this currency</p>
+            </div>
+            <button
+              type="button"
+              (click)="form.patchValue({ isActive: !form.value.isActive })"
+              class="relative h-7 w-14 rounded-full transition"
+              [class]="form.value.isActive ? 'bg-[#2e9bff]' : 'bg-[#2c3a4f]'"
+            >
+              <span
+                class="absolute top-1 h-5 w-5 rounded-full bg-white transition"
+                [class]="form.value.isActive ? 'right-1' : 'left-1'"
+              ></span>
+            </button>
+          </div>
+
+          <div
+            class="flex items-center justify-between rounded-xl border border-[#2e4159] bg-[#1b2533] p-3"
+          >
+            <div>
+              <p class="m-0 text-[1.6rem] font-semibold text-[#e6eef9]">Set as Default</p>
+              <p class="m-0 text-sm text-[#8ea1bb]">Base currency for calculations</p>
+            </div>
+            <button
+              type="button"
+              (click)="form.patchValue({ isDefault: !form.value.isDefault })"
+              class="grid h-6 w-6 place-items-center rounded-full border transition"
+              [class]="
+                form.value.isDefault
+                  ? 'border-[#2e9bff] bg-[#2e9bff]'
+                  : 'border-[#7f93ac] bg-transparent'
+              "
+            >
+              @if (form.value.isDefault) {
+                <span class="h-2.5 w-2.5 rounded-full bg-white"></span>
+              }
+            </button>
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <p
+            class="rounded-lg border border-[#7a3345] bg-[#26131a] px-3 py-2 text-sm text-[#ff9ab2]"
+          >
+            {{ errorMessage }}
+          </p>
+        }
+      </form>
+
+      <div class="flex justify-end gap-3 border-t border-[#2b3a4f] bg-[#1a2635] px-6 py-4">
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="px-5 py-2 text-sm font-bold uppercase tracking-tight text-[#9ab0ca] transition hover:text-[#eaf3ff]"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="save.emit()"
+          [disabled]="saving"
+          class="rounded-lg bg-[#2583ea] px-6 py-2 text-sm font-bold uppercase tracking-tight text-white transition hover:bg-[#1f75d1] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </section>
+}

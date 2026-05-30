@@ -1,0 +1,28 @@
+<app-admin-category-management
+  [isLoading]="isLoading"
+  [errorMessage]="errorMessage"
+  [data]="data"
+  [filteredCategories]="filteredCategories"
+  [searchForm]="searchForm"
+  [settingsForm]="settingsForm"
+  [isSavingLimit]="isSavingLimit"
+  [settingsMessage]="settingsMessage"
+  (retry)="onRetry()"
+  (addCategory)="openAddCategory()"
+  (search)="onSearch()"
+  (updateLimit)="updateGlobalLimit()"
+  (editCategory)="openEditCategory($event)"
+  (setDefault)="setDefault($event)"
+  (deleteCategory)="deleteCategory($event)"
+/>
+
+<app-admin-category-modal
+  [open]="isModalOpen"
+  [title]="modalTitle()"
+  [submitLabel]="modalSubmitLabel()"
+  [saving]="isModalSaving"
+  [errorMessage]="modalErrorMessage"
+  [form]="categoryForm"
+  (close)="closeCategoryModal()"
+  (save)="saveCategory()"
+/>

@@ -1,0 +1,53 @@
+<section class="flex min-h-[44rem] flex-col gap-4">
+  <header class="flex items-center justify-between gap-4">
+    <h3 class="m-0 text-[2.05rem] font-bold tracking-tight text-[#f5f8fe]">
+      Currency Usage Distribution
+    </h3>
+    <div class="flex gap-3">
+      <button
+        type="button"
+        [class]="periodButtonClass('30d')"
+        [disabled]="isLoading()"
+        (click)="onPeriodSelect('30d')"
+      >
+        30 Days
+      </button>
+      <button
+        type="button"
+        [class]="periodButtonClass('90d')"
+        [disabled]="isLoading()"
+        (click)="onPeriodSelect('90d')"
+      >
+        90 Days
+      </button>
+    </div>
+  </header>
+
+  <div
+    class="flex min-h-[35rem] flex-1 flex-col items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] px-6 py-10"
+  >
+    <div
+      class="relative h-[10.6rem] w-[10.6rem] rounded-full border-[0.7rem] border-[#2f3e54] before:absolute before:inset-[-0.7rem] before:rounded-full before:border-[0.7rem] before:border-transparent before:border-r-[#1f6fbf] before:border-t-[#2994ff] before:content-['']"
+    >
+      <div class="absolute inset-0 grid place-content-center text-center">
+        <span class="text-[0.9rem] font-semibold text-[#8da0ba]">Total</span>
+        <strong class="text-[2rem] font-bold leading-none text-[#f8fbff]"
+          >${{ usage().totalAmount.toLocaleString() }}</strong
+        >
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap justify-center gap-x-14 gap-y-5">
+      @for (segment of usage().segments; track segment.code; let i = $index) {
+        <div class="flex flex-col items-center gap-2.5">
+          <div [class]="segmentBarClass(i)"></div>
+          <span class="text-[0.8rem] font-semibold uppercase text-[#91a3bc]"
+            >{{ segment.code }} ({{ segment.percent }}%)</span
+          >
+        </div>
+      }
+    </div>
+
+    <p class="mt-12 text-[1.1rem] italic text-[#7f8da1]">[ Chart Visualization Placeholder ]</p>
+  </div>
+</section>
