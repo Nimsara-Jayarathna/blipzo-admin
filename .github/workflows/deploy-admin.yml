@@ -268,9 +268,41 @@ jobs:
             --label commit_sha="$SHA" \
             "${IMAGE}:${SHA}"
 
-          # Generic health checks (not Angular-template-specific)
-          docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/ >/dev/null"
-          docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/runtime-config.js >/dev/null"
+          if [ "$(docker inspect -f '{{.State.Running}}' "$CANDIDATE" 2>/dev/null || echo false)" != "true" ]; then
+            echo "Candidate container is not running." >&2
+            docker ps -a --filter "name=$CANDIDATE" >&2 || true
+            docker logs --tail=200 "$CANDIDATE" >&2 || true
+            exit 1
+          fi
+
+          # Generic health checks (not Angular-template-specific): retry until nginx is ready.
+          ok=false
+          for i in $(seq 1 20); do
+            if docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/ >/dev/null"; then
+              ok=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ok" != "true" ]; then
+            echo "Health check failed: unable to fetch / from candidate." >&2
+            docker logs --tail=200 "$CANDIDATE" >&2 || true
+            exit 1
+          fi
+
+          ok=false
+          for i in $(seq 1 20); do
+            if docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/runtime-config.js >/dev/null"; then
+              ok=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ok" != "true" ]; then
+            echo "Health check failed: unable to fetch /runtime-config.js from candidate." >&2
+            docker logs --tail=200 "$CANDIDATE" >&2 || true
+            exit 1
+          fi
 
           docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
 
