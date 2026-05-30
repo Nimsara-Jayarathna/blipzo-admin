@@ -66,10 +66,14 @@ export class UsersService {
 
   forceLogoutUser(userId: string): Observable<AdminUserForceLogoutData> {
     return this.http
-      .post<ApiSuccessResponse<AdminUserForceLogoutData>>(adminApiUrl(`users/${userId}/force-logout`), {}, {
-        withCredentials: true,
-        context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Forcing logout...'),
-      })
+      .post<ApiSuccessResponse<AdminUserForceLogoutData>>(
+        adminApiUrl(`users/${userId}/force-logout`),
+        {},
+        {
+          withCredentials: true,
+          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Forcing logout...'),
+        },
+      )
       .pipe(map((response) => response.data));
   }
 

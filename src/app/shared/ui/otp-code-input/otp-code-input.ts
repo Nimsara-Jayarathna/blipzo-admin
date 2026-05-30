@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, ElementRef, QueryList, ViewChildren, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  QueryList,
+  ViewChildren,
+  input,
+  output,
+} from '@angular/core';
 
 @Component({
   selector: 'app-otp-code-input',

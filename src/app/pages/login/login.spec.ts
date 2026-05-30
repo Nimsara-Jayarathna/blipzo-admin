@@ -86,9 +86,7 @@ describe('Login', () => {
 
   it('should show loading state while request is processing', async () => {
     const pendingLogin = new Subject<LoginResponse>();
-    loginMock.mockReturnValue(
-      pendingLogin.asObservable(),
-    );
+    loginMock.mockReturnValue(pendingLogin.asObservable());
 
     component.loginForm.setValue({
       email: 'admin@enterprise.com',

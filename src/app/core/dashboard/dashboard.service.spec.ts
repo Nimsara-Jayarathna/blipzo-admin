@@ -58,9 +58,7 @@ describe('DashboardService', () => {
             { code: 'OTHER', percent: 10, amount: 120000 },
           ],
         },
-        recentEvents: [
-          { level: 'ERROR', message: 'DB Connection Timeout', occurredAt: '2m ago' },
-        ],
+        recentEvents: [{ level: 'ERROR', message: 'DB Connection Timeout', occurredAt: '2m ago' }],
       },
     });
 

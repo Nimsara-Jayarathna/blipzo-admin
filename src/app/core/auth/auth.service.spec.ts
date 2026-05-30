@@ -40,9 +40,13 @@ describe('AuthService', () => {
     request.flush(buildLoginSuccessResponse());
 
     const result = await loginPromise;
-    expect(result.userEmail).toBe('admin@enterprise.com');
-    expect(result.roles).toEqual(['super_admin']);
-    expect(result.accessTokenExpiresInSeconds).toBe(900);
+    expect(result.kind).toBe('authenticated');
+    if (result.kind !== 'authenticated') {
+      throw new Error('Expected authenticated login result.');
+    }
+    expect(result.data.userEmail).toBe('admin@enterprise.com');
+    expect(result.data.roles).toEqual(['super_admin']);
+    expect(result.data.accessTokenExpiresInSeconds).toBe(900);
   });
 
   it('should send logout request with credentials', async () => {
@@ -52,7 +56,9 @@ describe('AuthService', () => {
     expect(request.request.withCredentials).toBe(true);
     expect(request.request.context.get(HTTP_REQUEST_LOADING_MESSAGE)).toBe('Signing out...');
     expect(request.request.context.get(SHOW_HTTP_REQUEST_SUCCESS)).toBe(true);
-    expect(request.request.context.get(HTTP_REQUEST_SUCCESS_MESSAGE)).toBe('Signed out successfully.');
+    expect(request.request.context.get(HTTP_REQUEST_SUCCESS_MESSAGE)).toBe(
+      'Signed out successfully.',
+    );
     request.flush({});
     await logoutPromise;
   });
@@ -77,10 +83,12 @@ describe('AuthService', () => {
       service.login({ email: 'admin@enterprise.com', password: 'wrong-pass' }),
     );
 
-    httpMock.expectOne(adminApiUrl('auth/login')).flush(
-      { success: false, message: 'Incorrect email or password.' },
-      { status: 401, statusText: 'Unauthorized' },
-    );
+    httpMock
+      .expectOne(adminApiUrl('auth/login'))
+      .flush(
+        { success: false, message: 'Incorrect email or password.' },
+        { status: 401, statusText: 'Unauthorized' },
+      );
 
     await expect(loginPromise).rejects.toThrow('Incorrect email or password.');
   });
@@ -102,7 +110,10 @@ describe('AuthService', () => {
     const sessionPromise = firstValueFrom(service.checkSession());
     httpMock
       .expectOne(adminApiUrl('auth/session'))
-      .flush({ success: false, message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+      .flush(
+        { success: false, message: 'Unauthorized' },
+        { status: 401, statusText: 'Unauthorized' },
+      );
 
     await expect(sessionPromise).resolves.toBe(false);
   });

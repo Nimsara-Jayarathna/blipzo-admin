@@ -1,9 +1,13 @@
 @if (isLoading) {
-  <div class="flex min-h-[18rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]">
+  <div
+    class="flex min-h-[18rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]"
+  >
     Loading system monitoring...
   </div>
 } @else if (errorMessage && !snapshot) {
-  <div class="flex min-h-[18rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]">
+  <div
+    class="flex min-h-[18rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]"
+  >
     <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
     <button
       type="button"
@@ -16,8 +20,12 @@
 } @else if (snapshot) {
   <section class="flex flex-col gap-8">
     <div>
-      <h3 class="m-0 text-[2rem] font-bold tracking-tight text-[#f2f8ff]">System Health & Monitoring</h3>
-      <p class="mt-1 text-[1rem] text-[#9aabc2]">Real-time infrastructure performance and administrative workflows.</p>
+      <h3 class="m-0 text-[2rem] font-bold tracking-tight text-[#f2f8ff]">
+        System Health & Monitoring
+      </h3>
+      <p class="mt-1 text-[1rem] text-[#9aabc2]">
+        Real-time infrastructure performance and administrative workflows.
+      </p>
     </div>
 
     @if (errorMessage) {
@@ -29,28 +37,43 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <article class="flex flex-col gap-5 rounded-2xl border border-[#32455d] bg-[#0b131f] p-6">
         <div class="flex items-center justify-between">
-          <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Email/SMS Provider Health</h4>
+          <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+            Email/SMS Provider Health
+          </h4>
           <span [class]="providerStatusClass()">{{ snapshot.providerHealth.status }}</span>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Send Rate</p>
-            <p class="mt-1 text-2xl font-bold text-[#f4f9ff]">{{ snapshot.providerHealth.sendRatePerDay }}/day</p>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Send Rate
+            </p>
+            <p class="mt-1 text-2xl font-bold text-[#f4f9ff]">
+              {{ snapshot.providerHealth.sendRatePerDay }}/day
+            </p>
           </div>
           <div>
-            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Failed Sends</p>
-            <p class="mt-1 text-2xl font-bold text-[#ff6f98]">{{ snapshot.providerHealth.failedToday }}</p>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Failed Sends
+            </p>
+            <p class="mt-1 text-2xl font-bold text-[#ff6f98]">
+              {{ snapshot.providerHealth.failedToday }}
+            </p>
           </div>
         </div>
 
         <div>
           <div class="mb-1 flex items-center justify-between">
-            <span class="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Daily Usage</span>
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >Daily Usage</span
+            >
             <span class="text-xs text-[#c9d8eb]">{{ snapshot.providerHealth.usagePct }}%</span>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-[#2b3a4f]">
-            <div class="h-full bg-[#2e9bff]" [style.width.%]="snapshot.providerHealth.usagePct"></div>
+            <div
+              class="h-full bg-[#2e9bff]"
+              [style.width.%]="snapshot.providerHealth.usagePct"
+            ></div>
           </div>
         </div>
 
@@ -66,7 +89,9 @@
 
       <article class="flex flex-col gap-5 rounded-2xl border border-[#32455d] bg-[#0b131f] p-6">
         <div class="flex items-center justify-between">
-          <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">DB Health & Storage</h4>
+          <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+            DB Health & Storage
+          </h4>
           <span class="inline-flex items-center gap-2 text-xs font-bold uppercase text-[#10d39f]">
             <span class="h-2 w-2 rounded-full bg-[#10d39f]"></span>
             {{ snapshot.dbHealth.connected ? 'Connected' : 'Disconnected' }}
@@ -75,28 +100,45 @@
 
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Total Size</p>
-            <p class="mt-1 text-lg font-bold text-[#f4f9ff]">{{ snapshot.dbHealth.totalSizeGb }} GB</p>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Total Size
+            </p>
+            <p class="mt-1 text-lg font-bold text-[#f4f9ff]">
+              {{ snapshot.dbHealth.totalSizeGb }} GB
+            </p>
           </div>
           <div>
-            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Data Size</p>
-            <p class="mt-1 text-sm font-semibold text-[#dce8f8]">{{ snapshot.dbHealth.dataSizeMb }} MB</p>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Data Size
+            </p>
+            <p class="mt-1 text-sm font-semibold text-[#dce8f8]">
+              {{ snapshot.dbHealth.dataSizeMb }} MB
+            </p>
           </div>
           <div>
-            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Index Size</p>
-            <p class="mt-1 text-sm font-semibold text-[#dce8f8]">{{ snapshot.dbHealth.indexSizeMb }} MB</p>
+            <p class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+              Index Size
+            </p>
+            <p class="mt-1 text-sm font-semibold text-[#dce8f8]">
+              {{ snapshot.dbHealth.indexSizeMb }} MB
+            </p>
           </div>
         </div>
 
         <div>
           <div class="mb-1 flex items-center justify-between">
-            <span class="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Storage Capacity</span>
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >Storage Capacity</span
+            >
             <span class="text-xs text-[#c9d8eb]">{{ snapshot.dbHealth.usedPct }}%</span>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-[#2b3a4f]">
             <div class="h-full bg-[#2e9bff]" [style.width.%]="snapshot.dbHealth.usedPct"></div>
           </div>
-          <p class="mt-2 text-[0.72rem] text-[#9aabc2]">Remaining: {{ snapshot.dbHealth.remainingGb }} GB / {{ snapshot.dbHealth.capacityGb }} GB</p>
+          <p class="mt-2 text-[0.72rem] text-[#9aabc2]">
+            Remaining: {{ snapshot.dbHealth.remainingGb }} GB /
+            {{ snapshot.dbHealth.capacityGb }} GB
+          </p>
         </div>
       </article>
     </div>
@@ -108,7 +150,9 @@
             <span class="material-symbols-outlined">backup</span>
           </div>
           <div>
-            <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">DB Backup</h4>
+            <h4 class="m-0 text-sm font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">
+              DB Backup
+            </h4>
             <p class="mt-1 text-sm text-[#d9e4f2]">Last Backup: {{ formatLastBackupDate() }}</p>
           </div>
         </div>
@@ -130,34 +174,58 @@
     <section>
       <div class="mb-3 flex items-center justify-between">
         <h3 class="m-0 text-[1.5rem] font-bold text-[#f2f8ff]">Delete Requests Workflow</h3>
-        <span class="text-xs uppercase tracking-[0.08em] text-[#9aabc2]">Pending: {{ snapshot.deleteRequests.pending }}</span>
+        <span class="text-xs uppercase tracking-[0.08em] text-[#9aabc2]"
+          >Pending: {{ snapshot.deleteRequests.pending }}</span
+        >
       </div>
 
       <div class="overflow-hidden rounded-2xl border border-[#32455d] bg-[#0b131f]">
         <table class="w-full min-w-[900px] border-collapse">
           <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
             <tr>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">User</th>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Request Date</th>
-              <th class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</th>
-              <th class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Actions</th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                User
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Request Date
+              </th>
+              <th
+                class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             @if (deleteRequests.length === 0) {
               <tr>
-                <td colspan="4" class="px-6 py-8 text-sm text-[#95a7bf]">No pending delete requests.</td>
+                <td colspan="4" class="px-6 py-8 text-sm text-[#95a7bf]">
+                  No pending delete requests.
+                </td>
               </tr>
             } @else {
               @for (request of deleteRequests; track request.id) {
                 <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
                   <td class="px-6 py-4">
                     <div class="flex flex-col">
-                      <span class="text-sm font-semibold text-[#f4f8ff]">{{ request.userName }}</span>
+                      <span class="text-sm font-semibold text-[#f4f8ff]">{{
+                        request.userName
+                      }}</span>
                       <span class="text-xs text-[#8fa3bf]">{{ request.userEmail }}</span>
                     </div>
                   </td>
-                  <td class="px-6 py-4 text-sm text-[#9fb2cb]">{{ formatDate(request.requestedAt) }}</td>
+                  <td class="px-6 py-4 text-sm text-[#9fb2cb]">
+                    {{ formatDate(request.requestedAt) }}
+                  </td>
                   <td class="px-6 py-4 text-center">
                     <span [class]="statusClass(request.status)">{{ request.status }}</span>
                   </td>

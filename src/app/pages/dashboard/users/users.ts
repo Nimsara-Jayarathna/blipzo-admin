@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize, take } from 'rxjs';
 import {
@@ -15,7 +21,12 @@ import { AdminUserProfileModalComponent } from '../../../shared/ui/admin-user-pr
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, ReactiveFormsModule, AdminConfirmDialogComponent, AdminUserProfileModalComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AdminConfirmDialogComponent,
+    AdminUserProfileModalComponent,
+  ],
   templateUrl: './users.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

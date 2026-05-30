@@ -26,8 +26,22 @@ Response data:
 ```json
 {
   "defaults": {
-    "income": { "id": "...", "name": "General Income", "type": "income", "isDefault": true, "isActive": true, "status": "DEFAULT" },
-    "expense": { "id": "...", "name": "Miscellaneous Expense", "type": "expense", "isDefault": true, "isActive": true, "status": "DEFAULT" }
+    "income": {
+      "id": "...",
+      "name": "General Income",
+      "type": "income",
+      "isDefault": true,
+      "isActive": true,
+      "status": "DEFAULT"
+    },
+    "expense": {
+      "id": "...",
+      "name": "Miscellaneous Expense",
+      "type": "expense",
+      "isDefault": true,
+      "isActive": true,
+      "status": "DEFAULT"
+    }
   },
   "settings": {
     "defaultCategoryLimit": 10

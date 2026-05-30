@@ -202,7 +202,11 @@ export class LoginVerify implements OnInit, OnDestroy {
       this.lockSeconds = Math.max(0, this.lockSeconds - 1);
       this.resendSeconds = Math.max(0, this.resendSeconds - 1);
 
-      if (this.otpExpiresSeconds === 0 && this.lockSeconds === 0 && this.verifyState !== 'submitting') {
+      if (
+        this.otpExpiresSeconds === 0 &&
+        this.lockSeconds === 0 &&
+        this.verifyState !== 'submitting'
+      ) {
         this.errorMessage = 'Verification session expired. Please login again.';
         this.verifyState = 'error';
       }

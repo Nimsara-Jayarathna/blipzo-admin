@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { AdminUserActivityItem, AdminUserProfile, UserStatus } from '../../../core/users/models/users.models';
+import {
+  AdminUserActivityItem,
+  AdminUserProfile,
+  UserStatus,
+} from '../../../core/users/models/users.models';
 
 @Component({
   selector: 'app-admin-user-profile-modal',

@@ -1,0 +1,24 @@
+{
+  "root": true,
+  "ignorePatterns": ["dist/**/*", "node_modules/**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["./tsconfig.eslint.json"]
+      },
+      "extends": [
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "@angular-eslint/prefer-inject": "off",
+        "@angular-eslint/no-output-native": "off"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended"]
+    }
+  ]
+}

@@ -102,8 +102,7 @@ describe('System', () => {
     await TestBed.configureTestingModule({
       imports: [System],
       providers: [{ provide: SystemService, useValue: systemServiceStub }],
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(System);
     component = fixture.componentInstance;

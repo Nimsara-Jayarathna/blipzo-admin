@@ -45,30 +45,45 @@ export class CategoriesService {
 
   setDefaultCategory(categoryId: string): Observable<AdminCategory> {
     return this.http
-      .post<ApiSuccessResponse<AdminCategory>>(adminApiUrl(`categories/${categoryId}/set-default`), {}, {
-        withCredentials: true,
-        context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Updating default category...'),
-      })
+      .post<ApiSuccessResponse<AdminCategory>>(
+        adminApiUrl(`categories/${categoryId}/set-default`),
+        {},
+        {
+          withCredentials: true,
+          context: new HttpContext().set(
+            HTTP_REQUEST_LOADING_MESSAGE,
+            'Updating default category...',
+          ),
+        },
+      )
       .pipe(map((response) => response.data));
   }
 
   deleteCategory(categoryId: string): Observable<{ id: string; deleted: boolean }> {
     return this.http
-      .delete<ApiSuccessResponse<{ id: string; deleted: boolean }>>(adminApiUrl(`categories/${categoryId}`), {
-        withCredentials: true,
-        context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Deleting category...'),
-      })
+      .delete<ApiSuccessResponse<{ id: string; deleted: boolean }>>(
+        adminApiUrl(`categories/${categoryId}`),
+        {
+          withCredentials: true,
+          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Deleting category...'),
+        },
+      )
       .pipe(map((response) => response.data));
   }
 
-  updateGlobalCategoryLimit(defaultCategoryLimit: number): Observable<{ defaultCategoryLimit: number }> {
+  updateGlobalCategoryLimit(
+    defaultCategoryLimit: number,
+  ): Observable<{ defaultCategoryLimit: number }> {
     return this.http
       .patch<ApiSuccessResponse<{ defaultCategoryLimit: number }>>(
         adminApiUrl('categories/settings'),
         { defaultCategoryLimit },
         {
           withCredentials: true,
-          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Updating category settings...'),
+          context: new HttpContext().set(
+            HTTP_REQUEST_LOADING_MESSAGE,
+            'Updating category settings...',
+          ),
         },
       )
       .pipe(map((response) => response.data));

@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize, take } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -14,7 +20,12 @@ import { AdminCurrencyListComponent } from '../../../shared/ui/admin-currency-li
 
 @Component({
   selector: 'app-currencies',
-  imports: [CommonModule, ReactiveFormsModule, AdminCurrencyListComponent, AdminCurrencyModalComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AdminCurrencyListComponent,
+    AdminCurrencyModalComponent,
+  ],
   templateUrl: './currencies.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,7 +35,12 @@ export class Currencies implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   readonly pageSize = Math.max(1, Number(environment.adminCurrenciesPageSize) || 10);
-  readonly filterStatusOptions: Array<'ALL' | CurrencyStatus> = ['ALL', 'DEFAULT', 'ENABLED', 'DISABLED'];
+  readonly filterStatusOptions: Array<'ALL' | CurrencyStatus> = [
+    'ALL',
+    'DEFAULT',
+    'ENABLED',
+    'DISABLED',
+  ];
   readonly filterForm = this.fb.nonNullable.group({
     code: '',
     name: '',

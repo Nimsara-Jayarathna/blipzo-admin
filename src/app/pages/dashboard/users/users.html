@@ -1,10 +1,14 @@
 <section class="w-full">
   @if (isLoading) {
-    <div class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]">
+    <div
+      class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]"
+    >
       Loading users...
     </div>
   } @else if (errorMessage) {
-    <div class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]">
+    <div
+      class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]"
+    >
       <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
       <button
         type="button"
@@ -22,7 +26,9 @@
         (ngSubmit)="onApplyFilter()"
       >
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Name</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Name</label
+          >
           <input
             type="text"
             formControlName="name"
@@ -32,7 +38,9 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Email</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Email</label
+          >
           <input
             type="text"
             formControlName="email"
@@ -42,7 +50,9 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">User ID</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >User ID</label
+          >
           <input
             type="text"
             formControlName="userId"
@@ -52,7 +62,9 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Status</label
+          >
           <select
             formControlName="status"
             class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
@@ -77,23 +89,47 @@
         <table class="w-full min-w-[760px] border-collapse">
           <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
             <tr>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">ID</th>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Name</th>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Email</th>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</th>
-              <th class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Actions</th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                ID
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Email
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
 
           <tbody>
             @if (pagedUsers.length === 0) {
               <tr>
-                <td class="px-6 py-8 text-sm text-[#95a7bf]" colspan="5">No users found for selected filters.</td>
+                <td class="px-6 py-8 text-sm text-[#95a7bf]" colspan="5">
+                  No users found for selected filters.
+                </td>
               </tr>
             } @else {
               @for (user of pagedUsers; track trackByUserId($index, user)) {
                 <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
-                  <td class="px-6 py-4 text-base font-medium text-[#a8b8cf]">#{{ displayUserId(user.id) }}</td>
+                  <td class="px-6 py-4 text-base font-medium text-[#a8b8cf]">
+                    #{{ displayUserId(user.id) }}
+                  </td>
                   <td class="px-6 py-4 text-base font-bold text-[#f4f8ff]">{{ user.name }}</td>
                   <td class="px-6 py-4 text-sm text-[#93a7c1]">{{ user.email }}</td>
                   <td class="px-6 py-4">
@@ -115,7 +151,9 @@
                     </button>
 
                     @if (actionMenuUserId === user.id) {
-                      <div class="absolute right-4 z-20 mt-2 w-40 rounded-lg border border-[#35506f] bg-[#101b2a] p-1 shadow-2xl">
+                      <div
+                        class="absolute right-4 z-20 mt-2 w-40 rounded-lg border border-[#35506f] bg-[#101b2a] p-1 shadow-2xl"
+                      >
                         <button
                           type="button"
                           (click)="openUserProfile(user)"
@@ -200,7 +238,11 @@
     [open]="true"
     tone="neutral"
     title="Confirm Reset Password"
-    [message]="'A temporary password will be generated for ' + selectedUserProfile.name + ' and sent to their registered email.'"
+    [message]="
+      'A temporary password will be generated for ' +
+      selectedUserProfile.name +
+      ' and sent to their registered email.'
+    "
     cancelLabel="Cancel"
     confirmLabel="Reset Password"
     [loading]="isResetLoading"
@@ -214,7 +256,9 @@
     [open]="true"
     tone="danger"
     title="Confirm Force Logout"
-    [message]="'This will invalidate all active tokens for ' + selectedUserProfile.name + ' immediately.'"
+    [message]="
+      'This will invalidate all active tokens for ' + selectedUserProfile.name + ' immediately.'
+    "
     cancelLabel="Cancel"
     confirmLabel="Confirm Logout"
     [loading]="isForceLogoutLoading"
