@@ -14,7 +14,7 @@ on:
       - 'tsconfig*.json'
       - '.github/workflows/deploy-admin.yml'
   pull_request:
-    branches: [main, dev]
+    branches: [main]
     paths:
       - 'src/**'
       - 'public/**'
@@ -39,16 +39,8 @@ env:
   DOCKER_NETWORK: npm_default
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    outputs:
-      deploy_env: ${{ steps.vars.outputs.deploy_env }}
-      image: ${{ steps.vars.outputs.image }}
-      image_tag_env: ${{ steps.vars.outputs.image_tag_env }}
-      image_tag_sha: ${{ steps.vars.outputs.image_tag_sha }}
-      build_cfg: ${{ steps.vars.outputs.build_cfg }}
-      container_name: ${{ steps.vars.outputs.container_name }}
-      docker_network: ${{ steps.vars.outputs.docker_network }}
 
     steps:
       - name: Checkout repository
@@ -72,34 +64,34 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Set build/deploy variables
+  build_image:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compute image variables
         id: vars
         shell: bash
         run: |
           set -euo pipefail
 
-          SHORT_SHA="$(git rev-parse --short HEAD)"
-          REPO_SLUG="${GITHUB_REPOSITORY:-${{ github.repository }}}"
-          if [ -z "${REPO_SLUG:-}" ]; then
-            echo "GITHUB_REPOSITORY is empty; cannot compute GHCR image name." >&2
-            exit 1
-          fi
+          REPO_SLUG="${{ github.repository }}"
+          SHA="${GITHUB_SHA::7}"
           IMAGE="ghcr.io/$(printf '%s' "$REPO_SLUG" | tr '[:upper:]' '[:lower:]')"
 
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            DEPLOY_ENV="production"
-            IMAGE_TAG_ENV="prod"
+            ENV_TAG="prod"
             BUILD_CFG="production"
-            CONTAINER_NAME="blipzo-admin-prod"
             ADMIN_API_BASE_URL="${{ secrets.ADMIN_API_BASE_URL_PROD }}"
             ADMIN_API_PREFIX="${{ secrets.ADMIN_API_PREFIX_PROD }}"
             ADMIN_API_VERSION="${{ secrets.ADMIN_API_VERSION_PROD }}"
             ADMIN_API_SEGMENT="${{ secrets.ADMIN_API_SEGMENT_PROD }}"
           else
-            DEPLOY_ENV="staging"
-            IMAGE_TAG_ENV="stg"
+            ENV_TAG="stg"
             BUILD_CFG="development"
-            CONTAINER_NAME="blipzo-admin-stg"
             ADMIN_API_BASE_URL="${{ secrets.ADMIN_API_BASE_URL_STG }}"
             ADMIN_API_PREFIX="${{ secrets.ADMIN_API_PREFIX_STG }}"
             ADMIN_API_VERSION="${{ secrets.ADMIN_API_VERSION_STG }}"
@@ -110,70 +102,49 @@ jobs:
           ADMIN_API_VERSION="${ADMIN_API_VERSION:-v1.1}"
           ADMIN_API_SEGMENT="${ADMIN_API_SEGMENT:-admin}"
 
-          DOCKER_NETWORK_FROM_SECRET="${{ secrets.NPM_NET_NAME }}"
-          DOCKER_NETWORK_EFFECTIVE="${DOCKER_NETWORK_FROM_SECRET:-${DOCKER_NETWORK}}"
-
           echo "::add-mask::$ADMIN_API_BASE_URL"
-          echo "::add-mask::$ADMIN_API_PREFIX"
-          echo "::add-mask::$ADMIN_API_VERSION"
-          echo "::add-mask::$ADMIN_API_SEGMENT"
 
-          echo "deploy_env=${DEPLOY_ENV}" >> "$GITHUB_OUTPUT"
-          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
-          echo "image_tag_env=${IMAGE_TAG_ENV}" >> "$GITHUB_OUTPUT"
-          echo "image_tag_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "build_cfg=${BUILD_CFG}" >> "$GITHUB_OUTPUT"
-          echo "container_name=${CONTAINER_NAME}" >> "$GITHUB_OUTPUT"
-          echo "docker_network=${DOCKER_NETWORK_EFFECTIVE}" >> "$GITHUB_OUTPUT"
-
-          {
-            echo "ADMIN_API_BASE_URL<<__EOF__"
-            printf '%s\n' "$ADMIN_API_BASE_URL"
-            echo "__EOF__"
-            echo "ADMIN_API_PREFIX<<__EOF__"
-            printf '%s\n' "$ADMIN_API_PREFIX"
-            echo "__EOF__"
-            echo "ADMIN_API_VERSION<<__EOF__"
-            printf '%s\n' "$ADMIN_API_VERSION"
-            echo "__EOF__"
-            echo "ADMIN_API_SEGMENT<<__EOF__"
-            printf '%s\n' "$ADMIN_API_SEGMENT"
-            echo "__EOF__"
-          } >> "$GITHUB_ENV"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          echo "SHA=$SHA" >> "$GITHUB_ENV"
+          echo "ENV_TAG=$ENV_TAG" >> "$GITHUB_ENV"
+          echo "BUILD_CFG=$BUILD_CFG" >> "$GITHUB_ENV"
+          echo "ADMIN_API_BASE_URL=$ADMIN_API_BASE_URL" >> "$GITHUB_ENV"
+          echo "ADMIN_API_PREFIX=$ADMIN_API_PREFIX" >> "$GITHUB_ENV"
+          echo "ADMIN_API_VERSION=$ADMIN_API_VERSION" >> "$GITHUB_ENV"
+          echo "ADMIN_API_SEGMENT=$ADMIN_API_SEGMENT" >> "$GITHUB_ENV"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
-        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build (and push on push events)
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
-          push: ${{ github.event_name == 'push' }}
+          push: true
           build-args: |
-            BUILD_CONFIGURATION=${{ steps.vars.outputs.build_cfg }}
+            BUILD_CONFIGURATION=${{ env.BUILD_CFG }}
             ADMIN_API_BASE_URL=${{ env.ADMIN_API_BASE_URL }}
             ADMIN_API_PREFIX=${{ env.ADMIN_API_PREFIX }}
             ADMIN_API_VERSION=${{ env.ADMIN_API_VERSION }}
             ADMIN_API_SEGMENT=${{ env.ADMIN_API_SEGMENT }}
           tags: |
-            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.image_tag_sha }}
-            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.image_tag_env }}
-            ${{ steps.vars.outputs.image }}:latest-${{ steps.vars.outputs.image_tag_env }}
+            ${{ env.IMAGE }}:${{ env.SHA }}
+            ${{ env.IMAGE }}:${{ env.ENV_TAG }}
+            ${{ env.IMAGE }}:latest-${{ env.ENV_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build_image
     if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
     env:
