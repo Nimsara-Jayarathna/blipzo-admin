@@ -1,0 +1,174 @@
+name: Deploy blipzo-admin
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "angular.json"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig*.json"
+      - ".github/workflows/deploy-admin.yml"
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "angular.json"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig*.json"
+      - ".github/workflows/deploy-admin.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blipzo-admin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_env: ${{ steps.vars.outputs.deploy_env }}
+      deploy_path: ${{ steps.vars.outputs.deploy_path }}
+      serve_dir: ${{ steps.vars.outputs.serve_dir }}
+      serve_port: ${{ steps.vars.outputs.serve_port }}
+      artifact_name: ${{ steps.vars.outputs.artifact_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set deployment variables
+        id: vars
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            DEPLOY_ENV="production"
+            DEPLOY_PATH="/var/www/blipzo-admin-prod"
+            SERVE_DIR="/var/www/blipzo-admin-prod/browser"
+            SERVE_PORT="4202"
+            ARTIFACT_NAME="admin-build-prod"
+          else
+            DEPLOY_ENV="staging"
+            DEPLOY_PATH="/var/www/blipzo-admin-stg"
+            SERVE_DIR="/var/www/blipzo-admin-stg/browser"
+            SERVE_PORT="4201"
+            ARTIFACT_NAME="admin-build-stg"
+          fi
+
+          echo "deploy_env=${DEPLOY_ENV}" >> "$GITHUB_OUTPUT"
+          echo "deploy_path=${DEPLOY_PATH}" >> "$GITHUB_OUTPUT"
+          echo "serve_dir=${SERVE_DIR}" >> "$GITHUB_OUTPUT"
+          echo "serve_port=${SERVE_PORT}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (dev -> development, main -> production)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            npm run build -- --configuration production
+          else
+            npm run build -- --configuration development
+          fi
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.vars.outputs.artifact_name }}
+          path: dist/blipzo-admin/
+          if-no-files-found: error
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+    environment: ${{ needs.build.outputs.deploy_env }}
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      DEPLOY_PATH: ${{ needs.build.outputs.deploy_path }}
+      SERVE_DIR: ${{ needs.build.outputs.serve_dir }}
+      SERVE_PORT: ${{ needs.build.outputs.serve_port }}
+      ARTIFACT_NAME: ${{ needs.build.outputs.artifact_name }}
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist/blipzo-admin/
+
+      - name: Prepare SSH key
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "::add-mask::$SSH_HOST"
+          echo "::add-mask::$SSH_PORT"
+          echo "::add-mask::$SSH_USER"
+          echo "::add-mask::$SSH_PRIVATE_KEY"
+
+          if [ -z "${SSH_PORT:-}" ] || ! echo "$SSH_PORT" | grep -Eq '^[0-9]+$'; then
+            echo "Invalid SSH_PORT" >&2
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          printf '%s' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -H -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+          echo "SSH_OPTS=-i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes" >> "$GITHUB_ENV"
+
+      - name: Create deploy directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'EOF'
+          set -euo pipefail
+          mkdir -p "$DEPLOY_PATH"
+          EOF
+
+      - name: Sync build to server
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -az --delete \
+            -e "ssh $SSH_OPTS -p $SSH_PORT" \
+            dist/blipzo-admin/ \
+            "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+
+      - name: Restart server (python http.server)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "SERVE_DIR='$SERVE_DIR' SERVE_PORT='$SERVE_PORT' bash -s" <<'EOF'
+          set -euo pipefail
+          if command -v fuser >/dev/null 2>&1; then
+            fuser -k "${SERVE_PORT}/tcp" || true
+          fi
+          nohup python3 -m http.server "$SERVE_PORT" --bind 127.0.0.1 --directory "$SERVE_DIR" \
+            >/dev/null 2>&1 &
+          EOF
