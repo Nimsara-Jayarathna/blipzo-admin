@@ -1,10 +1,14 @@
 <section class="w-full">
   @if (isLoading) {
-    <div class="flex min-h-[20rem] items-center justify-center rounded-2xl border border-[#314056] bg-[#0d1520] text-2xl text-[#dce8ff]">
+    <div
+      class="flex min-h-[20rem] items-center justify-center rounded-2xl border border-[#314056] bg-[#0d1520] text-2xl text-[#dce8ff]"
+    >
       Loading dashboard data...
     </div>
   } @else if (errorMessage) {
-    <div class="flex min-h-[20rem] flex-col items-center justify-center gap-4 rounded-2xl border border-[#314056] bg-[#0d1520] text-[#dce8ff]">
+    <div
+      class="flex min-h-[20rem] flex-col items-center justify-center gap-4 rounded-2xl border border-[#314056] bg-[#0d1520] text-[#dce8ff]"
+    >
       <p class="m-0 text-xl">{{ errorMessage }}</p>
       <button
         type="button"
@@ -15,7 +19,10 @@
       </button>
     </div>
   } @else if (snapshot) {
-    <app-dashboard-kpi-cards class="mb-7 block" [summary]="snapshot.summary"></app-dashboard-kpi-cards>
+    <app-dashboard-kpi-cards
+      class="mb-7 block"
+      [summary]="snapshot.summary"
+    ></app-dashboard-kpi-cards>
 
     <section class="grid gap-7 xl:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)]">
       <app-dashboard-currency-usage

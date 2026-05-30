@@ -5,13 +5,16 @@
     {
       "files": ["*.ts"],
       "parserOptions": {
-        "project": ["tsconfig.json"],
-        "createDefaultProgram": true
+        "project": ["./tsconfig.eslint.json"]
       },
       "extends": [
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates"
-      ]
+      ],
+      "rules": {
+        "@angular-eslint/prefer-inject": "off",
+        "@angular-eslint/no-output-native": "off"
+      }
     },
     {
       "files": ["*.html"],
@@ -19,4 +22,3 @@
     }
   ]
 }
-

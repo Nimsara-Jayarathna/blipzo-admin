@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { AdminCategoriesData, AdminCategory, CategoryType } from '../../../core/categories/models/categories.models';
+import {
+  AdminCategoriesData,
+  AdminCategory,
+  CategoryType,
+} from '../../../core/categories/models/categories.models';
 
 @Component({
   selector: 'app-admin-category-management',

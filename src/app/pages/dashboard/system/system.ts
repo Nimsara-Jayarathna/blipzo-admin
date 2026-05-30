@@ -1,8 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { catchError, finalize, forkJoin, interval, of, startWith, Subscription, switchMap, take } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
+import {
+  catchError,
+  finalize,
+  forkJoin,
+  interval,
+  of,
+  startWith,
+  Subscription,
+  switchMap,
+  take,
+} from 'rxjs';
 import { SystemService } from '../../../core/system/system.service';
-import { BackupJob, DeleteRequest, ProviderUsageHistory, SystemSnapshot } from '../../../core/system/models/system.models';
+import {
+  BackupJob,
+  DeleteRequest,
+  ProviderUsageHistory,
+  SystemSnapshot,
+} from '../../../core/system/models/system.models';
 import { AdminConfirmDialogComponent } from '../../../shared/ui/admin-confirm-dialog/admin-confirm-dialog';
 import { AdminSystemBackupModalComponent } from '../../../shared/ui/admin-system-backup-modal/admin-system-backup-modal';
 import { AdminSystemProviderUsageModalComponent } from '../../../shared/ui/admin-system-provider-usage-modal/admin-system-provider-usage-modal';

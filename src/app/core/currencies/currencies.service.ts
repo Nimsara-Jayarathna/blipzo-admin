@@ -59,10 +59,17 @@ export class CurrenciesService {
 
   setDefault(currencyId: string): Observable<AdminCurrency> {
     return this.http
-      .post<ApiSuccessResponse<AdminCurrency>>(adminApiUrl(`currencies/${currencyId}/set-default`), {}, {
-        withCredentials: true,
-        context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Updating default currency...'),
-      })
+      .post<ApiSuccessResponse<AdminCurrency>>(
+        adminApiUrl(`currencies/${currencyId}/set-default`),
+        {},
+        {
+          withCredentials: true,
+          context: new HttpContext().set(
+            HTTP_REQUEST_LOADING_MESSAGE,
+            'Updating default currency...',
+          ),
+        },
+      )
       .pipe(map((response) => response.data));
   }
 
@@ -73,7 +80,10 @@ export class CurrenciesService {
         { isActive },
         {
           withCredentials: true,
-          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Updating currency status...'),
+          context: new HttpContext().set(
+            HTTP_REQUEST_LOADING_MESSAGE,
+            'Updating currency status...',
+          ),
         },
       )
       .pipe(map((response) => response.data));

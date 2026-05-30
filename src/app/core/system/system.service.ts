@@ -27,7 +27,9 @@ export class SystemService {
   }
 
   getProviderUsage(date?: string): Observable<ProviderUsageHistory> {
-    const url = date ? adminApiUrl(`system/provider-usage?date=${encodeURIComponent(date)}`) : adminApiUrl('system/provider-usage');
+    const url = date
+      ? adminApiUrl(`system/provider-usage?date=${encodeURIComponent(date)}`)
+      : adminApiUrl('system/provider-usage');
     return this.http
       .get<ApiSuccessResponse<ProviderUsageHistory>>(url, {
         withCredentials: true,
@@ -74,8 +76,12 @@ export class SystemService {
     return adminApiUrl(`system/backup/${backupId}/download`);
   }
 
-  getDeleteRequests(status?: 'pending' | 'approved' | 'denied'): Observable<DeleteRequestsResponse> {
-    const url = status ? adminApiUrl(`system/delete-requests?status=${status}`) : adminApiUrl('system/delete-requests');
+  getDeleteRequests(
+    status?: 'pending' | 'approved' | 'denied',
+  ): Observable<DeleteRequestsResponse> {
+    const url = status
+      ? adminApiUrl(`system/delete-requests?status=${status}`)
+      : adminApiUrl('system/delete-requests');
     return this.http
       .get<ApiSuccessResponse<DeleteRequestsResponse>>(url, {
         withCredentials: true,
@@ -95,7 +101,10 @@ export class SystemService {
         { decision, note },
         {
           withCredentials: true,
-          context: new HttpContext().set(HTTP_REQUEST_LOADING_MESSAGE, 'Updating delete request...'),
+          context: new HttpContext().set(
+            HTTP_REQUEST_LOADING_MESSAGE,
+            'Updating delete request...',
+          ),
         },
       )
       .pipe(map((response) => ({ id: response.data.id, status: response.data.status })));

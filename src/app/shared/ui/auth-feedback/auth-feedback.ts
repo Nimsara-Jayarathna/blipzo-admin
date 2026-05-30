@@ -16,7 +16,8 @@ export class AuthFeedbackComponent {
   readonly successMessage = input('Login successful.');
 
   feedbackClass(): string {
-    const base = 'flex items-center gap-2 rounded-[0.6rem] border border-transparent px-3 py-2 text-[0.86rem]';
+    const base =
+      'flex items-center gap-2 rounded-[0.6rem] border border-transparent px-3 py-2 text-[0.86rem]';
 
     if (this.state() === 'loading') {
       return `${base} border-[rgba(148,170,198,0.45)] bg-[rgba(148,170,198,0.11)] text-[#d8e6f7]`;

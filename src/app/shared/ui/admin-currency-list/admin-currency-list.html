@@ -1,10 +1,14 @@
 <section class="w-full">
   @if (isLoading) {
-    <div class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]">
+    <div
+      class="flex min-h-[14rem] items-center justify-center rounded-2xl border border-[#32455d] bg-[#0b131f] text-[#a7b8cf]"
+    >
       Loading currencies...
     </div>
   } @else if (errorMessage) {
-    <div class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]">
+    <div
+      class="flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[#32455d] bg-[#0b131f]"
+    >
       <p class="m-0 text-[#d8e4f5]">{{ errorMessage }}</p>
       <button
         type="button"
@@ -33,7 +37,9 @@
         (ngSubmit)="applyFilter.emit()"
       >
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Code</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Code</label
+          >
           <input
             type="text"
             formControlName="code"
@@ -42,7 +48,9 @@
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Name</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Name</label
+          >
           <input
             type="text"
             formControlName="name"
@@ -51,7 +59,9 @@
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Symbol</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Symbol</label
+          >
           <input
             type="text"
             formControlName="symbol"
@@ -60,7 +70,9 @@
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</label>
+          <label class="text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#8ea1bb]"
+            >Status</label
+          >
           <select
             formControlName="status"
             class="h-10 rounded-lg border border-[#3b4b61] bg-[#1a2433] px-3 text-sm text-[#e8f0fc] outline-none focus:border-[#4d6f97]"
@@ -84,32 +96,64 @@
         <table class="w-full min-w-[880px] border-collapse">
           <thead class="border-b border-[#2c3b50] bg-[#1a2534]">
             <tr>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Code</th>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Name</th>
-              <th class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Symbol</th>
-              <th class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Status</th>
-              <th class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]">Actions</th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Code
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-4 text-center text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Symbol
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-4 text-right text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#8ea1bb]"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             @if (pagedCurrencies.length === 0) {
               <tr>
-                <td class="px-6 py-8 text-sm text-[#95a7bf]" colspan="5">No currencies found for selected filters.</td>
+                <td class="px-6 py-8 text-sm text-[#95a7bf]" colspan="5">
+                  No currencies found for selected filters.
+                </td>
               </tr>
             } @else {
               @for (currency of pagedCurrencies; track trackByCurrencyId($index, currency)) {
                 <tr class="border-t border-[#2b3a4f] transition hover:bg-[#131d2a]">
-                  <td class="px-6 py-5 text-[1.6rem] font-bold" [class]="currency.isDefault ? 'text-[#2e9bff]' : 'text-[#d8e5f8]'">
+                  <td
+                    class="px-6 py-5 text-[1.6rem] font-bold"
+                    [class]="currency.isDefault ? 'text-[#2e9bff]' : 'text-[#d8e5f8]'"
+                  >
                     {{ currency.code }}
                   </td>
-                  <td class="px-6 py-5 text-[1.6rem] font-semibold text-[#f4f8ff]">{{ currency.name }}</td>
-                  <td class="px-6 py-5 text-center text-[1.7rem] font-bold text-[#f4f8ff]">{{ currency.symbol }}</td>
+                  <td class="px-6 py-5 text-[1.6rem] font-semibold text-[#f4f8ff]">
+                    {{ currency.name }}
+                  </td>
+                  <td class="px-6 py-5 text-center text-[1.7rem] font-bold text-[#f4f8ff]">
+                    {{ currency.symbol }}
+                  </td>
                   <td class="px-6 py-5">
                     @if (currency.isDefault) {
                       <span [class]="statusClass(currency)">Default</span>
                     } @else {
                       <span [class]="statusClass(currency)">
-                        <span class="h-2 w-2 rounded-full" [class]="currency.isActive ? 'bg-[#16d3a5]' : 'bg-[#7388a3]'"></span>
+                        <span
+                          class="h-2 w-2 rounded-full"
+                          [class]="currency.isActive ? 'bg-[#16d3a5]' : 'bg-[#7388a3]'"
+                        ></span>
                         {{ currency.isActive ? 'Enabled' : 'Disabled' }}
                       </span>
                     }
@@ -134,11 +178,17 @@
                         type="button"
                         (click)="setDefault.emit(currency)"
                         class="grid h-6 w-6 place-items-center rounded-full border transition"
-                        [class]="currency.isDefault ? 'border-[#2e9bff] text-[#2e9bff]' : 'border-[#7f93ac] text-[#8ea1bb] hover:border-[#2e9bff] hover:text-[#2e9bff]'"
+                        [class]="
+                          currency.isDefault
+                            ? 'border-[#2e9bff] text-[#2e9bff]'
+                            : 'border-[#7f93ac] text-[#8ea1bb] hover:border-[#2e9bff] hover:text-[#2e9bff]'
+                        "
                         [attr.aria-label]="'Set ' + currency.code + ' as default'"
                       >
                         <span class="material-symbols-outlined text-[18px]">
-                          {{ currency.isDefault ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                          {{
+                            currency.isDefault ? 'radio_button_checked' : 'radio_button_unchecked'
+                          }}
                         </span>
                       </button>
 

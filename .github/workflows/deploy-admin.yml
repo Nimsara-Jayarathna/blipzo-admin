@@ -4,27 +4,27 @@ on:
   push:
     branches: [main, dev]
     paths:
-      - "src/**"
-      - "public/**"
-      - "Dockerfile"
-      - "nginx.conf"
-      - "angular.json"
-      - "package.json"
-      - "package-lock.json"
-      - "tsconfig*.json"
-      - ".github/workflows/deploy-admin.yml"
+      - 'src/**'
+      - 'public/**'
+      - 'Dockerfile'
+      - 'nginx.conf'
+      - 'angular.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/deploy-admin.yml'
   pull_request:
     branches: [main, dev]
     paths:
-      - "src/**"
-      - "public/**"
-      - "Dockerfile"
-      - "nginx.conf"
-      - "angular.json"
-      - "package.json"
-      - "package-lock.json"
-      - "tsconfig*.json"
-      - ".github/workflows/deploy-admin.yml"
+      - 'src/**'
+      - 'public/**'
+      - 'Dockerfile'
+      - 'nginx.conf'
+      - 'angular.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:
 
 permissions:
@@ -63,11 +63,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Format check
+        run: npm run format:check
+
       - name: Lint
         run: npm run lint
 
       - name: Unit tests
-        run: npm test -- --watch=false
+        run: npm test
 
       - name: Set build/deploy variables
         id: vars

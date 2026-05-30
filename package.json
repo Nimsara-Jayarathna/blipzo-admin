@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "watch": "ng build --watch --configuration development",
     "lint": "ng lint",
     "test": "ng test --watch=false"
@@ -46,6 +48,7 @@
     "@typescript-eslint/parser": "^8.60.0",
     "@tailwindcss/postcss": "^4.1.18",
     "jsdom": "^27.1.0",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

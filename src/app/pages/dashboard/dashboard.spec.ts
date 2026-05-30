@@ -21,8 +21,7 @@ describe('Dashboard', () => {
           },
         },
       ],
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Dashboard);
     component = fixture.componentInstance;

@@ -131,13 +131,17 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(LOGOUT_URL, {}, {
-      withCredentials: true,
-      context: new HttpContext()
-        .set(HTTP_REQUEST_LOADING_MESSAGE, 'Signing out...')
-        .set(SHOW_HTTP_REQUEST_SUCCESS, true)
-        .set(HTTP_REQUEST_SUCCESS_MESSAGE, 'Signed out successfully.'),
-    });
+    return this.http.post<void>(
+      LOGOUT_URL,
+      {},
+      {
+        withCredentials: true,
+        context: new HttpContext()
+          .set(HTTP_REQUEST_LOADING_MESSAGE, 'Signing out...')
+          .set(SHOW_HTTP_REQUEST_SUCCESS, true)
+          .set(HTTP_REQUEST_SUCCESS_MESSAGE, 'Signed out successfully.'),
+      },
+    );
   }
 
   checkSession(): Observable<boolean> {
@@ -152,9 +156,7 @@ export class AuthService {
       );
   }
 
-  private normalizeLoginResult(
-    response: ApiSuccessResponse<AdminLoginApiData>,
-  ): LoginResult {
+  private normalizeLoginResult(response: ApiSuccessResponse<AdminLoginApiData>): LoginResult {
     const payload = response.data;
     if (payload?.otpRequired) {
       return {

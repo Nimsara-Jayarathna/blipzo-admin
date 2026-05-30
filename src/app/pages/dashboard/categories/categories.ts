@@ -1,15 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize, take } from 'rxjs';
 import { CategoriesService } from '../../../core/categories/categories.service';
-import { AdminCategory, AdminCategoriesData, CategoryType } from '../../../core/categories/models/categories.models';
+import {
+  AdminCategory,
+  AdminCategoriesData,
+  CategoryType,
+} from '../../../core/categories/models/categories.models';
 import { AdminCategoryManagementComponent } from '../../../shared/ui/admin-category-management/admin-category-management';
 import { AdminCategoryModalComponent } from '../../../shared/ui/admin-category-modal/admin-category-modal';
 
 @Component({
   selector: 'app-categories',
-  imports: [CommonModule, ReactiveFormsModule, AdminCategoryManagementComponent, AdminCategoryModalComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AdminCategoryManagementComponent,
+    AdminCategoryModalComponent,
+  ],
   templateUrl: './categories.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -237,7 +252,9 @@ export class Categories implements OnInit {
         next: (data) => {
           this.data = data;
           this.filteredCategories = [...data.categories];
-          this.settingsForm.patchValue({ defaultCategoryLimit: data.settings.defaultCategoryLimit });
+          this.settingsForm.patchValue({
+            defaultCategoryLimit: data.settings.defaultCategoryLimit,
+          });
           this.searchForm.patchValue({ search: '' });
           this.cdr.markForCheck();
         },

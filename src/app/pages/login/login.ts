@@ -83,7 +83,8 @@ export class Login {
             });
           },
           error: (error: Error) => {
-            this.errorMessage = error.message || 'Unable to sign in. Please verify your credentials.';
+            this.errorMessage =
+              error.message || 'Unable to sign in. Please verify your credentials.';
             this.updateState('error');
             this.cdr.markForCheck();
           },
