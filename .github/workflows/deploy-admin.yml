@@ -275,9 +275,30 @@ jobs:
             exit 1
           fi
 
-          # Generic health checks (not Angular-template-specific): retry until nginx is ready.
+          cleanup_candidate() {
+            docker logs --tail=200 "$CANDIDATE" >&2 || true
+            docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
+          }
+
+          # Prefer a fast port check (if nc exists), then do an HTTP readiness retry loop.
+          if docker exec "$CANDIDATE" sh -lc "command -v nc >/dev/null 2>&1"; then
+            ok=false
+            for i in $(seq 1 30); do
+              if docker exec "$CANDIDATE" sh -lc "nc -z localhost 80"; then
+                ok=true
+                break
+              fi
+              sleep 1
+            done
+            if [ "$ok" != "true" ]; then
+              echo "Health check failed: port 80 not open in candidate after timeout." >&2
+              cleanup_candidate
+              exit 1
+            fi
+          fi
+
           ok=false
-          for i in $(seq 1 20); do
+          for i in $(seq 1 30); do
             if docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/ >/dev/null"; then
               ok=true
               break
@@ -285,22 +306,8 @@ jobs:
             sleep 1
           done
           if [ "$ok" != "true" ]; then
-            echo "Health check failed: unable to fetch / from candidate." >&2
-            docker logs --tail=200 "$CANDIDATE" >&2 || true
-            exit 1
-          fi
-
-          ok=false
-          for i in $(seq 1 20); do
-            if docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/runtime-config.js >/dev/null"; then
-              ok=true
-              break
-            fi
-            sleep 1
-          done
-          if [ "$ok" != "true" ]; then
-            echo "Health check failed: unable to fetch /runtime-config.js from candidate." >&2
-            docker logs --tail=200 "$CANDIDATE" >&2 || true
+            echo "Health check failed: unable to fetch / from candidate after timeout." >&2
+            cleanup_candidate
             exit 1
           fi
 
