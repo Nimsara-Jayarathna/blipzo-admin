@@ -257,70 +257,41 @@ jobs:
             docker network create --driver bridge "$NPM_NET_NAME"
           fi
 
+          # Cleanup any leftover candidate containers from previous runs.
+          docker ps -aq --filter "name=${CONTAINER_NAME}-cand-" | xargs -r docker rm -f >/dev/null 2>&1 || true
+
           docker pull "${IMAGE}:${SHA}"
 
-          CANDIDATE="${CONTAINER_NAME}-cand-${SHA}"
-          docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
+          docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
 
-          docker run -d --name "$CANDIDATE" \
+          docker run -d --name "$CONTAINER_NAME" \
             --network "$NPM_NET_NAME" \
+            --network-alias "$CONTAINER_NAME" \
             --restart unless-stopped \
             --label commit_sha="$SHA" \
             "${IMAGE}:${SHA}"
 
-          if [ "$(docker inspect -f '{{.State.Running}}' "$CANDIDATE" 2>/dev/null || echo false)" != "true" ]; then
-            echo "Candidate container is not running." >&2
-            docker ps -a --filter "name=$CANDIDATE" >&2 || true
-            docker logs --tail=200 "$CANDIDATE" >&2 || true
+          if [ "$(docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null || echo false)" != "true" ]; then
+            echo "Final container is not running." >&2
+            docker ps -a --filter "name=$CONTAINER_NAME" >&2 || true
+            docker logs --tail=200 "$CONTAINER_NAME" >&2 || true
             exit 1
           fi
 
-          cleanup_candidate() {
-            docker logs --tail=200 "$CANDIDATE" >&2 || true
-            docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
-          }
-
-          # Prefer a fast port check (if nc exists), then do an HTTP readiness retry loop.
-          if docker exec "$CANDIDATE" sh -lc "command -v nc >/dev/null 2>&1"; then
-            ok=false
-            for i in $(seq 1 30); do
-              if docker exec "$CANDIDATE" sh -lc "nc -z localhost 80"; then
-                ok=true
-                break
-              fi
-              sleep 1
-            done
-            if [ "$ok" != "true" ]; then
-              echo "Health check failed: port 80 not open in candidate after timeout." >&2
-              cleanup_candidate
-              exit 1
-            fi
-          fi
-
+          # Health check (retry until nginx is ready).
           ok=false
           for i in $(seq 1 30); do
-            if docker exec "$CANDIDATE" sh -lc "wget -qO- http://localhost/ >/dev/null"; then
+            if docker exec "$CONTAINER_NAME" sh -lc "wget -qO- http://localhost/ >/dev/null"; then
               ok=true
               break
             fi
             sleep 1
           done
           if [ "$ok" != "true" ]; then
-            echo "Health check failed: unable to fetch / from candidate after timeout." >&2
-            cleanup_candidate
+            echo "Health check failed: unable to fetch / from final container after timeout." >&2
+            docker logs --tail=200 "$CONTAINER_NAME" >&2 || true
             exit 1
           fi
-
-          docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
-
-          docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
-
-          docker run -d --name "$CONTAINER_NAME" \
-            --network "$NPM_NET_NAME" \
-            --network-alias blipzo-admin \
-            --restart unless-stopped \
-            --label commit_sha="$SHA" \
-            "${IMAGE}:${SHA}"
 
           docker image prune -f --filter "until=72h" >/dev/null 2>&1 || true
           EOF
