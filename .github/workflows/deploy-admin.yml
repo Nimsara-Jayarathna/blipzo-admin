@@ -278,17 +278,27 @@ jobs:
             exit 1
           fi
 
-          # Health check (retry until nginx is ready).
+          # Health check (hybrid: port open -> http ok). Retry up to 30s.
           ok=false
           for i in $(seq 1 30); do
-            if docker exec "$CONTAINER_NAME" sh -lc "wget -qO- http://localhost/ >/dev/null"; then
-              ok=true
-              break
+            if docker exec "$CONTAINER_NAME" sh -lc "command -v nc >/dev/null 2>&1"; then
+              if docker exec "$CONTAINER_NAME" sh -lc "nc -z localhost 80" >/dev/null 2>&1; then
+                if docker exec "$CONTAINER_NAME" sh -lc "wget -qO- http://localhost/ >/dev/null 2>&1"; then
+                  ok=true
+                  break
+                fi
+              fi
+            else
+              if docker exec "$CONTAINER_NAME" sh -lc "wget -qO- http://localhost/ >/dev/null 2>&1"; then
+                ok=true
+                break
+              fi
             fi
             sleep 1
           done
           if [ "$ok" != "true" ]; then
-            echo "Health check failed: unable to fetch / from final container after timeout." >&2
+            echo "Health check failed after timeout." >&2
+            docker ps -a --filter "name=$CONTAINER_NAME" >&2 || true
             docker logs --tail=200 "$CONTAINER_NAME" >&2 || true
             exit 1
           fi
