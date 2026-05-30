@@ -209,6 +209,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [ -z "${IMAGE:-}" ] || [ -z "${SHA:-}" ]; then
+            echo "Missing IMAGE or SHA for deploy." >&2
+            echo "IMAGE set? $( [ -n "${IMAGE:-}" ] && echo yes || echo no )" >&2
+            echo "SHA set? $( [ -n "${SHA:-}" ] && echo yes || echo no )" >&2
+            exit 1
+          fi
+          if ! echo "$SHA" | grep -Eq '^[0-9a-f]{6,40}$'; then
+            echo "Invalid SHA format (expected hex): $SHA" >&2
+            exit 1
+          fi
+          if ! echo "$IMAGE" | grep -Eq '^ghcr\.io/[a-z0-9._-]+/[a-z0-9._-]+$'; then
+            echo "Invalid IMAGE format: $IMAGE" >&2
+            exit 1
+          fi
           ssh $SSH_OPTS -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
             "NPM_NET_NAME='${DOCKER_NETWORK}' CONTAINER_NAME='${CONTAINER_NAME}' IMAGE='${IMAGE}' SHA='${SHA}' bash -s" <<'EOF'
           set -euo pipefail
