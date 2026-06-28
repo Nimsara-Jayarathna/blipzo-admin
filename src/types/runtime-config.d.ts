@@ -6,6 +6,7 @@ declare global {
       apiBaseUrl?: string;
       apiPrefix?: string;
       apiVersion?: string;
+      adminApiPrefix?: string;
       adminApiSegment?: string;
     };
   }

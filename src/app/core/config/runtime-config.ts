@@ -4,6 +4,7 @@ interface RuntimeConfig {
   apiBaseUrl: string;
   apiPrefix: string;
   apiVersion: string;
+  adminApiPrefix: string;
   adminApiSegment: string;
 }
 
@@ -22,6 +23,7 @@ function loadRuntimeConfig(): RuntimeConfig {
     apiBaseUrl: sanitizeString(globalConfig?.apiBaseUrl, environment.apiBaseUrl),
     apiPrefix: sanitizeString(globalConfig?.apiPrefix, environment.apiPrefix),
     apiVersion: sanitizeString(globalConfig?.apiVersion, environment.apiVersion),
+    adminApiPrefix: sanitizeString(globalConfig?.adminApiPrefix, environment.adminApiPrefix),
     adminApiSegment: sanitizeString(globalConfig?.adminApiSegment, environment.adminApiSegment),
   };
 }

@@ -10,20 +10,18 @@ function combineUrl(baseUrl: string, segments: string[]): string {
   return `${normalizedBase}/${path}`;
 }
 
+export function publicApiBaseUrl(): string {
+  return combineUrl(runtimeConfig.apiBaseUrl, [runtimeConfig.apiPrefix, runtimeConfig.apiVersion]);
+}
+
+export function adminApiBaseUrl(): string {
+  return combineUrl(runtimeConfig.apiBaseUrl, [runtimeConfig.adminApiPrefix, runtimeConfig.adminApiSegment]);
+}
+
 export function adminApiUrl(path: string): string {
-  return combineUrl(runtimeConfig.apiBaseUrl, [
-    runtimeConfig.apiPrefix,
-    runtimeConfig.apiVersion,
-    runtimeConfig.adminApiSegment,
-    path,
-  ]);
+  return combineUrl(adminApiBaseUrl(), [path]);
 }
 
 export function isAdminApiUrl(url: string): boolean {
-  const adminBase = combineUrl(runtimeConfig.apiBaseUrl, [
-    runtimeConfig.apiPrefix,
-    runtimeConfig.apiVersion,
-    runtimeConfig.adminApiSegment,
-  ]);
-  return url.startsWith(adminBase);
+  return url.startsWith(adminApiBaseUrl());
 }

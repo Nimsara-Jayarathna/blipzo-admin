@@ -9,15 +9,16 @@ COPY . .
 
 ARG BUILD_CONFIGURATION=production
 ARG ADMIN_API_BASE_URL=
-ARG ADMIN_API_PREFIX=api
+ARG ADMIN_API_PREFIX=internal
 ARG ADMIN_API_VERSION=v1.1
 ARG ADMIN_API_SEGMENT=admin
 
 RUN cat > /app/public/runtime-config.js <<EOF
 window.__BLIPZO_CONFIG__ = {
   apiBaseUrl: '${ADMIN_API_BASE_URL}',
-  apiPrefix: '${ADMIN_API_PREFIX}',
+  apiPrefix: 'api',
   apiVersion: '${ADMIN_API_VERSION}',
+  adminApiPrefix: '${ADMIN_API_PREFIX}',
   adminApiSegment: '${ADMIN_API_SEGMENT}',
 };
 EOF
