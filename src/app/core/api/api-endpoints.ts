@@ -15,7 +15,10 @@ export function publicApiBaseUrl(): string {
 }
 
 export function adminApiBaseUrl(): string {
-  return combineUrl(runtimeConfig.apiBaseUrl, [runtimeConfig.adminApiPrefix, runtimeConfig.adminApiSegment]);
+  return combineUrl(runtimeConfig.apiBaseUrl, [
+    runtimeConfig.adminApiPrefix,
+    runtimeConfig.adminApiSegment,
+  ]);
 }
 
 export function adminApiUrl(path: string): string {

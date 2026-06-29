@@ -9,6 +9,8 @@ on:
       - 'Dockerfile'
       - 'nginx.conf'
       - 'angular.json'
+      - '.nvmrc'
+      - '.npmrc'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig*.json'
@@ -21,6 +23,8 @@ on:
       - 'Dockerfile'
       - 'nginx.conf'
       - 'angular.json'
+      - '.nvmrc'
+      - '.npmrc'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig*.json'
@@ -46,23 +50,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Format check
-        run: npm run format:check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Unit tests
-        run: npm test
+      - name: Check
+        run: npm run check
 
   build_image:
     runs-on: ubuntu-latest
